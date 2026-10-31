@@ -7,8 +7,11 @@ for the Subscription Management System according to Brightloop Software security
 requirements.
 """
 
+from datetime import timedelta
+import hashlib
 import re
-from odoo import api, fields, models
+import secrets
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 # Special characters allowed and checked for password complexity
@@ -17,9 +20,21 @@ SPECIAL_CHARS_PATTERN = r'[!@#$%^&*()_+\-=\[\]{}|;\':",.<>?/\\]'
 
 class ResUsers(models.Model):
     """
-    Inherit res.users to add server-side password validation rules.
+    Inherit res.users to add server-side password validation rules and password reset flow.
     """
     _inherit = 'res.users'
+
+    password_reset_token = fields.Char(
+        string='Password Reset Token',
+        copy=False,
+        groups='base.group_system',
+    )
+
+    password_reset_token_expiry = fields.Datetime(
+        string='Token Expiry',
+        copy=False,
+        groups='base.group_system',
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -127,3 +142,38 @@ class ResUsers(models.Model):
             raise ValidationError(
                 f"Password does not meet security requirements:\n{failure_list}"
             )
+
+    def _generate_reset_token(self):
+        """Generate a secure 24-hour token for password reset."""
+        self.ensure_one()
+        raw_token = secrets.token_urlsafe(32)
+        hashed_token = hashlib.sha256(raw_token.encode()).hexdigest()
+        self.sudo().write({
+            'password_reset_token': hashed_token,
+            'password_reset_token_expiry': fields.Datetime.now() + timedelta(hours=24),
+        })
+        return raw_token
+
+    def _verify_reset_token(self, token):
+        """Verify a password reset token is valid and not expired."""
+        self.ensure_one()
+
+        hashed_token = hashlib.sha256(token.encode()).hexdigest()
+
+        if self.password_reset_token != hashed_token:
+            return False
+
+        if (
+            not self.password_reset_token_expiry
+            or self.password_reset_token_expiry < fields.Datetime.now()
+        ):
+            return False
+
+        return True
+
+    def _clear_reset_token(self):
+        """Clear reset token after successful reset or expiration."""
+        self.sudo().write({
+            'password_reset_token': False,
+            'password_reset_token_expiry': False,
+        })
