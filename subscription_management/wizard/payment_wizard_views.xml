@@ -5,6 +5,7 @@
         <field name="model">subscription.payment.wizard</field>
         <field name="arch" type="xml">
             <form string="Register Payment">
+                <field name="currency_id" invisible="1"/>
                 <group>
                     <group string="Invoice Summary">
                         <field name="invoice_id" readonly="1"/>

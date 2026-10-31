@@ -208,6 +208,9 @@ class Subscription(models.Model):
         self._check_state(['confirmed', 'paused'], _("activate"))
         self.write({'state': 'active'})
 
+    def action_resume(self):
+        return self.action_activate()
+
     def action_pause(self):
         self._check_state(['active'], _("pause"))
         if self.filtered(lambda r: not r.plan_id.allow_pause):

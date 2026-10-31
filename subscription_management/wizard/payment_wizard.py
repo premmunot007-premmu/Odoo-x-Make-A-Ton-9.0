@@ -8,8 +8,9 @@ class SubscriptionPaymentWizard(models.TransientModel):
 
     invoice_id = fields.Many2one('subscription.invoice', string="Invoice", required=True)
     partner_id = fields.Many2one('res.partner', related='invoice_id.partner_id', readonly=True, string="Customer")
-    amount = fields.Float(string="Payment Amount", required=True, digits=(10, 2))
-    amount_due = fields.Float(related='invoice_id.amount_due', readonly=True, string="Outstanding Balance")
+    currency_id = fields.Many2one('res.currency', related='invoice_id.currency_id', readonly=True)
+    amount = fields.Monetary(string="Payment Amount", required=True, currency_field='currency_id')
+    amount_due = fields.Monetary(related='invoice_id.amount_due', readonly=True, string="Outstanding Balance", currency_field='currency_id')
     payment_method = fields.Selection([
         ('bank_transfer', 'Bank Transfer'),
         ('credit_card', 'Credit Card'),

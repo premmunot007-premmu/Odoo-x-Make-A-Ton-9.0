@@ -192,6 +192,9 @@ class SubscriptionInvoice(models.Model):
         self._check_state(['confirmed'], _("mark as paid"))
         self.write({'state': 'paid'})
 
+    def action_draft(self):
+        return self.action_reset_to_draft()
+
     def action_reset_to_draft(self):
         self._check_state(['cancelled'], _("reset to draft"))
         self.write({'state': 'draft'})

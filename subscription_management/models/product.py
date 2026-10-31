@@ -26,7 +26,7 @@ class SubscriptionProduct(models.Model):
         string="Sales Price", required=True, default=0.0, digits=(10, 2), tracking=True,
     )
     cost_price = fields.Float(string="Cost Price", digits=(10, 2))
-    notes = fields.Html(string="Description")
+    notes = fields.Html(string="Internal Notes")
     image = fields.Binary(string="Product Image", attachment=True)
     is_active = fields.Boolean(string="Active", default=True)
     variant_ids = fields.One2many(
@@ -102,6 +102,7 @@ class SubscriptionProductVariant(models.Model):
     )
     name = fields.Char(string="Variant Name", compute='_compute_name', store=True, readonly=False)
     variant_code = fields.Char(string="Variant Code")
+    description = fields.Text(string="Description")
     active = fields.Boolean(string="Active", default=True)
     is_active = fields.Boolean(string="Is Active", default=True)
 

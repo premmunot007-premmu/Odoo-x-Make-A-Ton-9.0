@@ -136,7 +136,7 @@
     <menuitem id="menu_subscription_root"
               name="Subscription Management"
               sequence="10"
-              groups="subscription_management.group_subscription_user"
+              groups="subscription_management.group_subscription_staff"
               web_icon="subscription_management,static/description/icon.png"/>
 
     <!-- 1. Executive Dashboard (Sequence 1) -->
@@ -145,7 +145,7 @@
               parent="menu_subscription_root"
               action="action_subscription_dashboard"
               sequence="1"
-              groups="subscription_management.group_subscription_manager"/>
+              groups="subscription_management.group_subscription_admin"/>
 
     <!-- 2. Subscriptions (Sequence 10) -->
     <menuitem id="menu_subscription_main"
@@ -219,7 +219,7 @@
               name="Configuration"
               parent="menu_subscription_root"
               sequence="50"
-              groups="subscription_management.group_subscription_manager"/>
+              groups="subscription_management.group_subscription_admin"/>
 
     <menuitem id="menu_quotation_templates"
               name="Quotation Templates"
