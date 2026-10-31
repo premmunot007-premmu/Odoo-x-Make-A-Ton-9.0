@@ -6,8 +6,8 @@
             <field name="name">INV/2026/09/0001</field>
             <field name="partner_id" ref="customer_small_shop"/>
             <field name="subscription_id" ref="sub_active_acuity"/>
-            <field name="invoice_date" eval="(datetime.date.today().replace(day=1) - datetime.timedelta(days=1)).replace(day=1).strftime('%Y-%m-%d')"/>
-            <field name="due_date" eval="(datetime.date.today() - datetime.timedelta(days=15)).strftime('%Y-%m-%d')"/>
+            <field name="invoice_date">2026-09-01</field>
+            <field name="due_date">2026-09-15</field>
             <field name="state">paid</field>
         </record>
 
@@ -32,8 +32,8 @@
             <field name="name">INV/2026/10/0002</field>
             <field name="partner_id" ref="customer_enterprise_corp"/>
             <field name="subscription_id" ref="sub_active_starlight"/>
-            <field name="invoice_date" eval="(datetime.date.today() - datetime.timedelta(days=5)).strftime('%Y-%m-%d')"/>
-            <field name="due_date" eval="(datetime.date.today() + datetime.timedelta(days=25)).strftime('%Y-%m-%d')"/>
+            <field name="invoice_date">2026-10-25</field>
+            <field name="due_date">2026-11-25</field>
             <field name="state">confirmed</field>
         </record>
 
@@ -53,21 +53,20 @@
             <field name="unit_price">1500.0</field>
         </record>
 
-        <!-- 3. Overdue Urgent Invoice -->
-        <record id="inv_overdue_urgent" model="subscription.invoice">
+        <!-- 3. Overdue Unpaid Invoice -->
+        <record id="inv_overdue_unpaid" model="subscription.invoice">
             <field name="name">INV/2026/09/0003</field>
             <field name="partner_id" ref="customer_retail_chain"/>
             <field name="subscription_id" ref="sub_paused_urbancart"/>
-            <field name="invoice_date" eval="(datetime.date.today() - datetime.timedelta(days=45)).strftime('%Y-%m-%d')"/>
-            <field name="due_date" eval="(datetime.date.today() - datetime.timedelta(days=15)).strftime('%Y-%m-%d')"/>
-            <field name="state">overdue</field>
-            <field name="notes">Payment overdue by 15 days - 2nd reminder sent</field>
+            <field name="invoice_date">2026-09-15</field>
+            <field name="due_date">2026-10-15</field>
+            <field name="state">confirmed</field>
         </record>
 
         <record id="inv_line_overdue_crm" model="subscription.invoice.line">
-            <field name="invoice_id" ref="inv_overdue_urgent"/>
+            <field name="invoice_id" ref="inv_overdue_unpaid"/>
             <field name="product_id" ref="prod_brightloop_crm"/>
-            <field name="description">Brightloop CRM - 2 Licences</field>
+            <field name="description">Brightloop CRM (2 Seats)</field>
             <field name="quantity">2.0</field>
             <field name="unit_price">1200.0</field>
         </record>
@@ -75,17 +74,18 @@
         <!-- 4. Draft Upcoming Invoice -->
         <record id="inv_draft_upcoming" model="subscription.invoice">
             <field name="name">INV/2026/10/0004</field>
-            <field name="partner_id" ref="customer_tech_startup"/>
-            <field name="invoice_date" eval="datetime.date.today().strftime('%Y-%m-%d')"/>
-            <field name="due_date" eval="(datetime.date.today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')"/>
+            <field name="partner_id" ref="customer_small_shop"/>
+            <field name="subscription_id" ref="sub_active_acuity"/>
+            <field name="invoice_date">2026-10-31</field>
+            <field name="due_date">2026-11-30</field>
             <field name="state">draft</field>
         </record>
 
         <record id="inv_line_draft_crm" model="subscription.invoice.line">
             <field name="invoice_id" ref="inv_draft_upcoming"/>
             <field name="product_id" ref="prod_brightloop_crm"/>
-            <field name="description">Brightloop CRM - Pilot 5 Seats</field>
-            <field name="quantity">5.0</field>
+            <field name="description">Brightloop CRM - Renewal Month 2</field>
+            <field name="quantity">1.0</field>
             <field name="unit_price">1200.0</field>
         </record>
     </data>

@@ -7,8 +7,8 @@
             <field name="partner_id" ref="customer_small_shop"/>
             <field name="plan_id" ref="plan_starter_monthly"/>
             <field name="state">active</field>
-            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')"/>
-            <field name="next_billing_date" eval="(datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="start_date">2026-10-01</field>
+            <field name="next_billing_date">2026-11-01</field>
             <field name="payment_term">30_days</field>
         </record>
 
@@ -32,10 +32,10 @@
             <field name="partner_id" ref="customer_enterprise_corp"/>
             <field name="plan_id" ref="plan_growth_yearly"/>
             <field name="state">active</field>
-            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=180)).strftime('%Y-%m-%d')"/>
-            <field name="end_date" eval="(datetime.date.today() + datetime.timedelta(days=185)).strftime('%Y-%m-%d')"/>
-            <field name="expiry_date" eval="(datetime.date.today() + datetime.timedelta(days=185)).strftime('%Y-%m-%d')"/>
-            <field name="next_billing_date" eval="(datetime.date.today() + datetime.timedelta(days=185)).strftime('%Y-%m-%d')"/>
+            <field name="start_date">2026-05-01</field>
+            <field name="end_date">2027-05-01</field>
+            <field name="expiry_date">2027-05-01</field>
+            <field name="next_billing_date">2027-05-01</field>
             <field name="payment_term">60_days</field>
         </record>
 
@@ -60,7 +60,7 @@
             <field name="partner_id" ref="customer_tech_startup"/>
             <field name="plan_id" ref="plan_starter_monthly"/>
             <field name="state">quotation</field>
-            <field name="start_date" eval="datetime.date.today().strftime('%Y-%m-%d')"/>
+            <field name="start_date">2026-10-31</field>
             <field name="payment_term">30_days</field>
         </record>
 
@@ -77,7 +77,7 @@
             <field name="partner_id" ref="customer_retail_chain"/>
             <field name="plan_id" ref="plan_starter_monthly"/>
             <field name="state">paused</field>
-            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=90)).strftime('%Y-%m-%d')"/>
+            <field name="start_date">2026-08-01</field>
             <field name="payment_term">30_days</field>
         </record>
 
@@ -94,9 +94,9 @@
             <field name="partner_id" ref="customer_small_shop"/>
             <field name="plan_id" ref="plan_trial_daily"/>
             <field name="state">closed</field>
-            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=60)).strftime('%Y-%m-%d')"/>
-            <field name="end_date" eval="(datetime.date.today() - datetime.timedelta(days=45)).strftime('%Y-%m-%d')"/>
-            <field name="expiry_date" eval="(datetime.date.today() - datetime.timedelta(days=45)).strftime('%Y-%m-%d')"/>
+            <field name="start_date">2026-08-01</field>
+            <field name="end_date">2026-08-15</field>
+            <field name="expiry_date">2026-08-15</field>
             <field name="payment_term">immediate</field>
         </record>
 

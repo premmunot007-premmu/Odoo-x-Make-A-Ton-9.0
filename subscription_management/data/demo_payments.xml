@@ -5,8 +5,8 @@
         <record id="pay_bank_transfer_full" model="subscription.payment">
             <field name="invoice_id" ref="inv_paid_last_month"/>
             <field name="payment_method">bank_transfer</field>
-            <field name="amount">1450.0</field>
-            <field name="payment_date" eval="(datetime.date.today() - datetime.timedelta(days=10)).strftime('%Y-%m-%d')"/>
+            <field name="amount">950.0</field>
+            <field name="payment_date">2026-09-20</field>
             <field name="reference">HDFC-NEFT-991823901</field>
             <field name="note">Full settlement received via NEFT corporate banking</field>
         </record>
@@ -16,7 +16,7 @@
             <field name="invoice_id" ref="inv_confirmed_outstanding"/>
             <field name="payment_method">upi</field>
             <field name="amount">25000.0</field>
-            <field name="payment_date" eval="(datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')"/>
+            <field name="payment_date">2026-10-29</field>
             <field name="reference">UPI/390192830192/GPay</field>
             <field name="note">Advance milestone installment via GPay corporate handle</field>
         </record>
@@ -26,7 +26,7 @@
             <field name="invoice_id" ref="inv_paid_last_month"/>
             <field name="payment_method">credit_card</field>
             <field name="amount">500.0</field>
-            <field name="payment_date" eval="(datetime.date.today() - datetime.timedelta(days=12)).strftime('%Y-%m-%d')"/>
+            <field name="payment_date">2026-09-18</field>
             <field name="reference">STRIPE_CH_99A102Z</field>
             <field name="note">Card recurring auto-charge</field>
         </record>

@@ -6,7 +6,6 @@
             <field name="name">GST 18%</field>
             <field name="tax_type">percentage</field>
             <field name="amount">18.0</field>
-            <field name="active">True</field>
             <field name="is_active">True</field>
             <field name="description">Standard Goods &amp; Services Tax for Software &amp; Cloud Services</field>
         </record>
@@ -15,7 +14,6 @@
             <field name="name">Service Cess 5%</field>
             <field name="tax_type">percentage</field>
             <field name="amount">5.0</field>
-            <field name="active">True</field>
             <field name="is_active">True</field>
             <field name="description">Special IT consulting and SLA support services cess</field>
         </record>
@@ -24,7 +22,6 @@
             <field name="name">Fixed Platform Levy</field>
             <field name="tax_type">fixed</field>
             <field name="amount">100.0</field>
-            <field name="active">True</field>
             <field name="is_active">True</field>
             <field name="description">Dedicated secure compute environment surcharge</field>
         </record>
@@ -38,7 +35,6 @@
             <field name="apply_on">subscription</field>
             <field name="max_usage">100</field>
             <field name="current_usage">2</field>
-            <field name="active">True</field>
             <field name="is_active">True</field>
             <field name="description">Applies to any subscription with 10 or more licenses</field>
         </record>
@@ -51,7 +47,6 @@
             <field name="apply_on">subscription</field>
             <field name="max_usage">50</field>
             <field name="current_usage">8</field>
-            <field name="active">True</field>
             <field name="is_active">True</field>
             <field name="description">New onboarded startup welcome credit for orders ₹2000+</field>
         </record>
@@ -64,7 +59,6 @@
             <field name="product_ids" eval="[(6, 0, [ref('prod_brightloop_crm')])]"/>
             <field name="max_usage">20</field>
             <field name="current_usage">3</field>
-            <field name="active">True</field>
             <field name="is_active">True</field>
             <field name="description">Early bird introductory discount on Brightloop CRM licenses</field>
         </record>

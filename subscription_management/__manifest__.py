@@ -43,16 +43,15 @@ Comprehensive enterprise subscription lifecycle management for Odoo 18:
         'reports/invoice_report.xml',
         'reports/subscription_report.xml',
         'views/menu.xml',
-    ],
-    'demo': [
+        'data/demo_customers.xml',
         'data/demo_products.xml',
         'data/demo_plans.xml',
-        'data/demo_customers.xml',
         'data/demo_discounts_taxes.xml',
         'data/demo_subscriptions.xml',
         'data/demo_invoices.xml',
         'data/demo_payments.xml',
     ],
+    'demo': [],
     'assets': {
         'web.assets_backend': [
             'subscription_management/static/src/js/dashboard.js',
