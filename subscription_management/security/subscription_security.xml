@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Application Category -->
+    <record id="module_category_subscription" model="ir.module.category">
+        <field name="name">Subscription Management</field>
+        <field name="description">Manage access to subscription products, plans, billing, and customer portal.</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Role: Customer Portal -->
+    <record id="group_subscription_customer" model="res.groups">
+        <field name="name">Customer (Portal)</field>
+        <field name="category_id" ref="module_category_subscription"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+    </record>
+
+    <!-- Role: Internal Staff -->
+    <record id="group_subscription_staff" model="res.groups">
+        <field name="name">Staff (Sales &amp; Billing)</field>
+        <field name="category_id" ref="module_category_subscription"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Role: Administrator -->
+    <record id="group_subscription_admin" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_subscription"/>
+        <field name="implied_ids" eval="[(4, ref('group_subscription_staff'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

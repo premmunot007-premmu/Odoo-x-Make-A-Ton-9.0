@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Template: Subscription Confirmed -->
+        <record id="email_template_subscription_confirmed" model="mail.template">
+            <field name="name">Subscription: Confirmation</field>
+            <field name="model_id" ref="model_subscription_subscription"/>
+            <field name="subject">Your Subscription {{ object.name }} is Confirmed</field>
+            <field name="email_from">{{ (object.company_id.email or 'billing@brightloop.com') }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <h2 style="color: #1e3a8a;">Brightloop Software</h2>
+                    <p>Dear <t t-out="object.partner_id.name or 'Customer'"/>,</p>
+                    <p>Thank you for subscribing! Your subscription <strong><t t-out="object.name"/></strong> has been successfully confirmed.</p>
+                    <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Plan:</strong> <t t-out="object.plan_id.name"/></p>
+                        <p style="margin: 5px 0;"><strong>Billing Frequency:</strong> <t t-out="object.plan_id.billing_frequency.capitalize()"/></p>
+                        <p style="margin: 5px 0;"><strong>Start Date:</strong> <t t-out="object.start_date"/></p>
+                        <p style="margin: 5px 0;"><strong>Total Amount:</strong> ₹<t t-out="object.amount_total"/></p>
+                    </div>
+                    <p>You can manage and view your subscription details anytime by logging into your portal:</p>
+                    <p style="text-align: center; margin: 25px 0;">
+                        <a t-att-href="'/my/subscriptions/' + str(object.id)" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Subscription</a>
+                    </p>
+                    <p style="color: #64748b; font-size: 12px;">Best regards,<br/>Brightloop Software Billing Team</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Template: Invoice Sent -->
+        <record id="email_template_invoice_sent" model="mail.template">
+            <field name="name">Subscription: Invoice Notice</field>
+            <field name="model_id" ref="model_subscription_invoice"/>
+            <field name="subject">Invoice {{ object.name }} from Brightloop Software</field>
+            <field name="email_from">{{ (object.company_id.email or 'billing@brightloop.com') }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <h2 style="color: #1e3a8a;">Brightloop Software</h2>
+                    <p>Dear <t t-out="object.partner_id.name or 'Customer'"/>,</p>
+                    <p>Your subscription invoice <strong><t t-out="object.name"/></strong> is now ready.</p>
+                    <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Invoice Date:</strong> <t t-out="object.invoice_date"/></p>
+                        <p style="margin: 5px 0;"><strong>Due Date:</strong> <t t-out="object.due_date or 'Immediate'"/></p>
+                        <p style="margin: 5px 0;"><strong>Total Payable:</strong> ₹<t t-out="object.amount_total"/></p>
+                    </div>
+                    <p style="text-align: center; margin: 25px 0;">
+                        <a t-att-href="'/my/invoices/' + str(object.id)" style="background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View &amp; Pay Invoice</a>
+                    </p>
+                    <p style="color: #64748b; font-size: 12px;">Thank you for your business!</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Template: Payment Received -->
+        <record id="email_template_payment_received" model="mail.template">
+            <field name="name">Subscription: Payment Receipt</field>
+            <field name="model_id" ref="model_subscription_payment"/>
+            <field name="subject">Payment Receipt for Invoice {{ object.invoice_id.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or 'billing@brightloop.com') }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <h2 style="color: #10b981;">Payment Received</h2>
+                    <p>Dear <t t-out="object.partner_id.name or 'Customer'"/>,</p>
+                    <p>We have received your payment of <strong>₹<t t-out="object.amount"/></strong> via <t t-out="object.payment_method.replace('_', ' ').title()"/>.</p>
+                    <p><strong>Transaction Ref:</strong> <t t-out="object.reference or 'N/A'"/></p>
+                    <p><strong>Remaining Balance:</strong> ₹<t t-out="object.invoice_id.amount_due"/></p>
+                    <p style="color: #64748b; font-size: 12px;">Brightloop Software Accounts Team</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Template: Password Reset -->
+        <record id="email_template_password_reset" model="mail.template">
+            <field name="name">Subscription: Password Reset</field>
+            <field name="model_id" ref="base.model_res_users"/>
+            <field name="subject">Reset Your Password - Brightloop Software</field>
+            <field name="email_from">no-reply@brightloop.com</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <h2 style="color: #1e3a8a;">Password Reset Request</h2>
+                    <p>Hello <t t-out="object.name"/>,</p>
+                    <p>A password reset request was received for your Brightloop account. Click the button below to set a new password:</p>
+                    <p style="text-align: center; margin: 25px 0;">
+                        <a t-att-href="ctx.get('reset_url')" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+                    </p>
+                    <p style="color: #ef4444; font-size: 13px;">This link is valid for 24 hours. If you did not request this, please disregard this email.</p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template: Customer Signup Page -->
+    <template id="signup_page" name="Brightloop Customer Signup">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+                <style>
+                    body { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+                    .auth-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); width: 100%; max-width: 480px; padding: 32px; }
+                    .pwd-req { font-size: 0.82rem; color: #64748b; margin-bottom: 4px; }
+                    .pwd-valid { color: #10b981 !important; font-weight: 600; }
+                </style>
+            </t>
+            <div class="auth-card">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary">Brightloop Software</h3>
+                    <p class="text-muted">Create your customer account</p>
+                </div>
+
+                <t t-if="error">
+                    <div class="alert alert-danger py-2" role="alert">
+                        <t t-out="error"/>
+                    </div>
+                </t>
+
+                <form method="post" action="/subscription/signup">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Full Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="John Doe" required="required"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Company / Business Name</label>
+                        <input type="text" name="company_name" class="form-control" placeholder="Acme Inc."/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Address *</label>
+                        <input type="email" name="email" class="form-control" placeholder="you@company.com" required="required"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Password *</label>
+                        <input type="password" id="password" name="password" class="form-control" required="required"/>
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <div class="pwd-req" id="req-len">• Minimum 8 characters</div>
+                            <div class="pwd-req" id="req-upper">• At least 1 uppercase letter (A-Z)</div>
+                            <div class="pwd-req" id="req-lower">• At least 1 lowercase letter (a-z)</div>
+                            <div class="pwd-req" id="req-spec">• At least 1 special character (!@#$%^&amp;*)</div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Confirm Password *</label>
+                        <input type="password" name="confirm_password" class="form-control" required="required"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Sign Up</button>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">Already have an account? <a href="/subscription/login" class="text-decoration-none">Sign In</a></small>
+                    </div>
+                </form>
+
+                <script><![CDATA[
+                    const pwd = document.getElementById('password');
+                    if (pwd) {
+                        pwd.addEventListener('input', function() {
+                            const val = this.value;
+                            document.getElementById('req-len').classList.toggle('pwd-valid', val.length >= 8);
+                            document.getElementById('req-upper').classList.toggle('pwd-valid', /[A-Z]/.test(val));
+                            document.getElementById('req-lower').classList.toggle('pwd-valid', /[a-z]/.test(val));
+                            document.getElementById('req-spec').classList.toggle('pwd-valid', /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(val));
+                        });
+                    }
+                ]]></script>
+            </div>
+        </t>
+    </template>
+
+    <!-- Template: Customer Login Page -->
+    <template id="login_page" name="Brightloop Customer Login">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+                <style>
+                    body { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+                    .auth-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); width: 100%; max-width: 420px; padding: 32px; }
+                </style>
+            </t>
+            <div class="auth-card">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary">Brightloop Software</h3>
+                    <p class="text-muted">Customer &amp; Billing Portal</p>
+                </div>
+
+                <t t-if="success">
+                    <div class="alert alert-success py-2" role="alert">
+                        <t t-out="success"/>
+                    </div>
+                </t>
+
+                <t t-if="error">
+                    <div class="alert alert-danger py-2" role="alert">
+                        <t t-out="error"/>
+                    </div>
+                </t>
+
+                <form method="post" action="/subscription/login">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Address</label>
+                        <input type="email" name="login" class="form-control" required="required" placeholder="name@company.com"/>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label fw-semibold">Password</label>
+                            <a href="/subscription/reset-password" class="small text-decoration-none">Forgot?</a>
+                        </div>
+                        <input type="password" name="password" class="form-control" required="required"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Sign In</button>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">New customer? <a href="/subscription/signup" class="text-decoration-none">Create an account</a></small>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <!-- Template: Password Reset Request Page -->
+    <template id="reset_password_page" name="Brightloop Reset Password Request">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+                <style>
+                    body { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+                    .auth-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); width: 100%; max-width: 420px; padding: 32px; }
+                </style>
+            </t>
+            <div class="auth-card">
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold text-primary">Reset Your Password</h4>
+                    <p class="text-muted small">Enter your registered email and we'll send you a link to reset your password.</p>
+                </div>
+
+                <t t-if="success">
+                    <div class="alert alert-info py-2" role="alert">
+                        <t t-out="success"/>
+                    </div>
+                </t>
+
+                <t t-if="error">
+                    <div class="alert alert-danger py-2" role="alert">
+                        <t t-out="error"/>
+                    </div>
+                </t>
+
+                <form method="post" action="/subscription/reset-password">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Registered Email</label>
+                        <input type="email" name="email" class="form-control" required="required" placeholder="name@company.com"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Send Reset Link</button>
+                    <div class="text-center mt-3">
+                        <a href="/subscription/login" class="small text-decoration-none">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <!-- Template: Password Reset Confirm Page -->
+    <template id="reset_password_confirm_page" name="Brightloop Set New Password">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+                <style>
+                    body { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+                    .auth-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); width: 100%; max-width: 420px; padding: 32px; }
+                </style>
+            </t>
+            <div class="auth-card">
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold text-primary">Set New Password</h4>
+                    <p class="text-muted small">Enter your new secure password.</p>
+                </div>
+
+                <t t-if="error">
+                    <div class="alert alert-danger py-2" role="alert">
+                        <t t-out="error"/>
+                    </div>
+                </t>
+
+                <form method="post" action="/subscription/reset-password/confirm">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="token" t-att-value="token"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">New Password</label>
+                        <input type="password" name="password" class="form-control" required="required"/>
+                        <small class="text-muted">Must have 8+ chars, upper, lower, and special char.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Confirm Password</label>
+                        <input type="password" name="confirm_password" class="form-control" required="required"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Update Password</button>
+                </form>
+            </div>
+        </t>
+    </template>
+</odoo>

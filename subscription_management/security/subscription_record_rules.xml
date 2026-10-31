@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal User Rules: Restrict to Customer's Own Partner Records -->
+    <record id="rule_subscription_portal_user" model="ir.rule">
+        <field name="name">Portal Customer: Own Subscriptions Only</field>
+        <field name="model_id" ref="model_subscription_subscription"/>
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_subscription_line_portal_user" model="ir.rule">
+        <field name="name">Portal Customer: Own Subscription Lines Only</field>
+        <field name="model_id" ref="model_subscription_subscription_line"/>
+        <field name="domain_force">[('subscription_id.partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_invoice_portal_user" model="ir.rule">
+        <field name="name">Portal Customer: Own Invoices Only</field>
+        <field name="model_id" ref="model_subscription_invoice"/>
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_invoice_line_portal_user" model="ir.rule">
+        <field name="name">Portal Customer: Own Invoice Lines Only</field>
+        <field name="model_id" ref="model_subscription_invoice_line"/>
+        <field name="domain_force">[('invoice_id.partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_payment_portal_user" model="ir.rule">
+        <field name="name">Portal Customer: Own Payments Only</field>
+        <field name="model_id" ref="model_subscription_payment"/>
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Internal Staff & Admin Rules: Multi-Company Support -->
+    <record id="rule_subscription_multi_company" model="ir.rule">
+        <field name="name">Subscription: Multi-Company Rule</field>
+        <field name="model_id" ref="model_subscription_subscription"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_invoice_multi_company" model="ir.rule">
+        <field name="name">Invoice: Multi-Company Rule</field>
+        <field name="model_id" ref="model_subscription_invoice"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
