@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- List -->
-    <record id="view_subscription_tax_list" model="ir.ui.view">
-        <field name="name">subscription.tax.list</field>
+    <record id="view_subscription_tax_tree" model="ir.ui.view">
+        <field name="name">subscription.tax.tree</field>
         <field name="model">subscription.tax</field>
         <field name="arch" type="xml">
-            <list string="Tax Rules" decoration-muted="not is_active">
+            <list string="Taxes" decoration-muted="not is_active">
                 <field name="name"/>
-                <field name="tax_type"/>
+                <field name="tax_type" widget="badge"
+                       decoration-info="tax_type == 'percentage'"
+                       decoration-success="tax_type == 'fixed'"/>
                 <field name="amount"/>
                 <field name="is_active" widget="boolean_toggle"/>
             </list>
         </field>
     </record>
 
-    <!-- Form -->
     <record id="view_subscription_tax_form" model="ir.ui.view">
         <field name="name">subscription.tax.form</field>
         <field name="model">subscription.tax</field>
         <field name="arch" type="xml">
             <form string="Tax Rule">
                 <sheet>
-                    <widget name="web_ribbon" title="Inactive" bg_color="text-bg-danger" invisible="is_active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. GST 18%, Service Tax 5%"/>
+                        </h1>
+                    </div>
                     <group>
-                        <group>
-                            <field name="name" placeholder="e.g. GST 18%"/>
-                            <field name="tax_type" widget="radio" options="{'horizontal': true}"/>
-                            <label for="amount"/>
-                            <div class="o_row">
-                                <field name="amount"/>
-                                <span invisible="tax_type != 'percentage'">%</span>
-                            </div>
-                            <field name="is_active"/>
+                        <group string="Tax Computation">
+                            <field name="tax_type"/>
+                            <field name="amount"/>
+                        </group>
+                        <group string="Status &amp; Scope">
+                            <field name="is_active" widget="boolean_toggle"/>
+                            <field name="description"/>
                         </group>
                     </group>
-                    <field name="description" placeholder="Description..."/>
                 </sheet>
             </form>
         </field>

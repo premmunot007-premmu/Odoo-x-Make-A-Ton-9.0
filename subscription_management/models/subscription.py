@@ -83,6 +83,33 @@ class Subscription(models.Model):
     user_id = fields.Many2one(
         'res.users', string="Salesperson", default=lambda self: self.env.user, tracking=True,
     )
+    end_date = fields.Date(string="End Date", compute='_compute_end_date', inverse='_inverse_end_date', store=True)
+    total_amount = fields.Monetary(string="Total Amount", compute='_compute_total_amount', store=True)
+    notes = fields.Text(string="Notes Text", compute='_compute_notes', inverse='_inverse_notes', store=True)
+
+    @api.depends('expiry_date')
+    def _compute_end_date(self):
+        for rec in self:
+            rec.end_date = rec.expiry_date
+
+    def _inverse_end_date(self):
+        for rec in self:
+            rec.expiry_date = rec.end_date
+
+    @api.depends('amount_total')
+    def _compute_total_amount(self):
+        for rec in self:
+            rec.total_amount = rec.amount_total
+
+    @api.depends('note')
+    def _compute_notes(self):
+        for rec in self:
+            rec.notes = str(rec.note or '')
+
+    def _inverse_notes(self):
+        for rec in self:
+            rec.note = rec.notes
+
     note = fields.Html(string="Internal Notes")
     is_expired = fields.Boolean(
         string="Expired", compute='_compute_is_expired', search='_search_is_expired',

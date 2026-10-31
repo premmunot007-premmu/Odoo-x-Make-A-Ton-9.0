@@ -1,138 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- List -->
+    <!-- Invoice List View -->
     <record id="view_subscription_invoice_list" model="ir.ui.view">
         <field name="name">subscription.invoice.list</field>
         <field name="model">subscription.invoice</field>
         <field name="arch" type="xml">
-            <list string="Invoices"
-                  decoration-danger="is_overdue"
+            <list default_order="invoice_date desc"
+                  decoration-danger="state == 'overdue'"
                   decoration-success="state == 'paid'"
+                  decoration-info="state == 'confirmed'"
                   decoration-muted="state == 'cancelled'">
-                <field name="currency_id" column_invisible="1"/>
-                <field name="is_overdue" column_invisible="1"/>
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="subscription_id" optional="show"/>
                 <field name="invoice_date"/>
                 <field name="due_date"/>
-                <field name="amount_total" widget="monetary" sum="Total"/>
+                <field name="total_amount" widget="monetary" sum="Total"/>
+                <field name="amount_paid" widget="monetary" sum="Paid" optional="show"/>
                 <field name="amount_due" widget="monetary" sum="Due"/>
-                <field name="payment_status" widget="badge"
-                       decoration-success="payment_status == 'paid'"
-                       decoration-warning="payment_status == 'partial'"
-                       decoration-danger="payment_status == 'not_paid' and is_overdue"/>
+                <field name="currency_id" column_invisible="1"/>
                 <field name="state" widget="badge"
-                       decoration-info="state == 'confirmed'"
+                       decoration-danger="state == 'overdue'"
                        decoration-success="state == 'paid'"
-                       decoration-muted="state in ('draft', 'cancelled')"/>
+                       decoration-info="state == 'confirmed'"
+                       decoration-muted="state == 'cancelled'"
+                       decoration-warning="state == 'draft'"/>
             </list>
         </field>
     </record>
 
-    <!-- Form -->
+    <!-- Invoice Form View -->
     <record id="view_subscription_invoice_form" model="ir.ui.view">
         <field name="name">subscription.invoice.form</field>
         <field name="model">subscription.invoice</field>
         <field name="arch" type="xml">
             <form string="Invoice">
                 <header>
-                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary" invisible="state != 'draft'"/>
-                    <button name="action_register_payment" string="Register Payment" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
-                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('paid', 'cancelled')"
-                            confirm="Cancel this invoice?"/>
-                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" invisible="state != 'cancelled'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_register_payment" type="object" string="Register Payment"
+                            class="btn-primary" invisible="state not in ('confirmed', 'overdue') or amount_due &lt;= 0"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            class="btn-danger" invisible="state not in ('draft', 'confirmed')"/>
+                    <button name="action_draft" type="object" string="Set to Draft"
+                            class="btn-secondary" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,paid"/>
                 </header>
                 <sheet>
-                    <widget name="web_ribbon" title="Paid" bg_color="text-bg-success" invisible="state != 'paid'"/>
-                    <widget name="web_ribbon" title="Overdue" bg_color="text-bg-danger" invisible="not is_overdue"/>
-                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-secondary" invisible="state != 'cancelled'"/>
-                    <field name="currency_id" invisible="1"/>
-                    <field name="is_overdue" invisible="1"/>
-                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <widget name="web_ribbon" title="OVERDUE"
+                            bg_color="text-bg-danger"
+                            invisible="state != 'overdue'"/>
+                    <widget name="web_ribbon" title="CANCELLED"
+                            bg_color="text-bg-secondary"
+                            invisible="state != 'cancelled'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
                     <group>
-                        <group>
+                        <group string="Customer Details">
                             <field name="partner_id" readonly="state != 'draft'"/>
                             <field name="subscription_id" readonly="state != 'draft'"/>
-                            <field name="invoice_date" readonly="state != 'draft'"/>
-                            <field name="due_date" readonly="state in ('paid', 'cancelled')"/>
                             <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
                         </group>
-                        <group>
-                            <field name="payment_status" widget="badge"
-                                   decoration-success="payment_status == 'paid'"
-                                   decoration-warning="payment_status == 'partial'"/>
-                            <field name="amount_paid" widget="monetary"/>
-                            <field name="amount_due" widget="monetary"/>
+                        <group string="Invoice Details">
+                            <field name="invoice_date" readonly="state != 'draft'"/>
+                            <field name="due_date"/>
+                            <field name="payment_status" widget="badge"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Invoice Lines" name="lines">
-                            <field name="invoice_line_ids" readonly="state != 'draft'">
+                            <field name="invoice_line_ids" readonly="state in ('paid', 'cancelled')">
                                 <list editable="bottom">
-                                    <field name="currency_id" column_invisible="1"/>
-                                    <field name="product_id" domain="[('is_active', '=', True)]"/>
+                                    <field name="product_id"/>
                                     <field name="description"/>
                                     <field name="quantity"/>
-                                    <field name="unit_price"/>
-                                    <field name="tax_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                                    <field name="discount_amount"/>
-                                    <field name="subtotal" sum="Subtotal"/>
-                                    <field name="tax_amount" sum="Tax" optional="show"/>
-                                    <field name="total" sum="Total"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="discount" optional="show"/>
+                                    <field name="tax_id" optional="show"/>
+                                    <field name="subtotal" widget="monetary" readonly="1" sum="Subtotal"/>
                                 </list>
                             </field>
-                            <group class="oe_subtotal_footer">
-                                <field name="amount_untaxed" widget="monetary"/>
-                                <field name="amount_tax" widget="monetary"/>
-                                <field name="amount_total" widget="monetary" class="oe_subtotal_footer_separator"/>
+                            <group class="oe_subtotal_footer oe_right" colspan="2">
+                                <field name="subtotal" widget="monetary" string="Untaxed Subtotal"/>
+                                <field name="tax_amount" widget="monetary" string="Taxes"/>
+                                <field name="total_amount" widget="monetary" class="oe_subtotal_footer_separator" string="Total Amount"/>
+                                <field name="amount_paid" widget="monetary" string="Amount Paid"/>
+                                <field name="amount_due" widget="monetary" class="fw-bold" string="Amount Due"/>
                             </group>
                         </page>
-                        <page string="Payments" name="payments" invisible="not payment_ids">
-                            <!-- Read-only here; payments are added with "Register Payment" so their checks apply. -->
+                        <page string="Payments" name="payments">
                             <field name="payment_ids" readonly="1">
                                 <list>
-                                    <field name="currency_id" column_invisible="1"/>
                                     <field name="payment_date"/>
-                                    <field name="payment_method"/>
-                                    <field name="amount" widget="monetary" sum="Total Paid"/>
+                                    <field name="name"/>
+                                    <field name="payment_method" widget="badge"/>
+                                    <field name="amount" widget="monetary" sum="Total"/>
                                     <field name="reference"/>
                                 </list>
                             </field>
                         </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Additional customer-facing terms or internal invoice notes..."/>
+                        </page>
                     </notebook>
-                    <field name="note" placeholder="Additional notes..."/>
                 </sheet>
                 <chatter/>
             </form>
         </field>
     </record>
 
-    <!-- Search -->
+    <!-- Invoice Search View -->
     <record id="view_subscription_invoice_search" model="ir.ui.view">
         <field name="name">subscription.invoice.search</field>
         <field name="model">subscription.invoice</field>
         <field name="arch" type="xml">
-            <search string="Invoices">
-                <field name="name"/>
-                <field name="partner_id"/>
-                <field name="subscription_id"/>
+            <search string="Search Invoices">
+                <field name="name" string="Invoice"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="subscription_id" string="Subscription"/>
                 <separator/>
-                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="Confirmed" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
-                <filter string="Paid" name="filter_paid" domain="[('state', '=', 'paid')]"/>
-                <filter string="Cancelled" name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="filter_paid" string="Paid" domain="[('state', '=', 'paid')]"/>
+                <filter name="filter_overdue" string="Overdue" domain="[('state', '=', 'overdue')]"/>
                 <separator/>
-                <filter string="Overdue" name="filter_overdue" domain="[('is_overdue', '=', True)]"/>
-                <filter string="Partially Paid" name="filter_partial" domain="[('payment_status', '=', 'partial')]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('invoice_date', '&gt;=', context_today().strftime('%%Y-%%m-01'))]"/>
                 <separator/>
-                <filter string="Invoice Date" name="filter_invoice_date" date="invoice_date"/>
+                <filter name="filter_cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
-                    <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
-                    <filter string="Subscription" name="group_subscription" context="{'group_by': 'subscription_id'}"/>
-                    <filter string="Month" name="group_month" context="{'group_by': 'invoice_date:month'}"/>
+                    <filter name="group_by_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_customer" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_subscription" string="Subscription" context="{'group_by': 'subscription_id'}"/>
+                    <filter name="group_by_month" string="Invoice Month" context="{'group_by': 'invoice_date:month'}"/>
                 </group>
             </search>
         </field>

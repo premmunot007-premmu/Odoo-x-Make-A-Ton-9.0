@@ -1,0 +1,129 @@
+# Executive Dashboard OWL Styling & Micro-interactions
+
+## Context
+The finance lead requires high-performance KPI cards that respond in under two seconds. Prem provides advanced SCSS micro-interactions, responsive grids, and subtle box-shadow styling for the OWL dashboard.
+
+## Prompt for Antigravity
+
+```markdown
+In our Odoo 18 module `subscription_management`, update `static/src/scss/dashboard.scss`:
+
+```scss
+// Subscription Executive Dashboard Styling
+.o_subscription_dashboard {
+    padding: 28px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+
+    .dash_title_bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .refresh_btn {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease;
+
+            &:hover {
+                background-color: #2563eb;
+            }
+        }
+    }
+
+    .kpi_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 28px;
+
+        .kpi_card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            }
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+            }
+
+            &.kpi_blue::before { background: #3b82f6; }
+            &.kpi_green::before { background: #10b981; }
+            &.kpi_yellow::before { background: #f59e0b; }
+            &.kpi_red::before { background: #ef4444; }
+
+            .kpi_title {
+                font-size: 0.875rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #64748b;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .kpi_value {
+                font-size: 2.25rem;
+                font-weight: 800;
+                color: #0f172a;
+                line-height: 1;
+            }
+        }
+    }
+
+    .data_panels {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+
+        .panel_card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+            .panel_header {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 16px;
+                border-bottom: 1px solid #f1f5f9;
+                padding-bottom: 10px;
+            }
+        }
+    }
+}
+```
+```
+
+## Expected Output
+- `static/src/scss/dashboard.scss`
+
+## Verification
+Open Dashboard from top navigation. Cards should display with top accent bars, smooth hover elevations, and clean typography.

@@ -1,158 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Report Action -->
+    <!-- Subscription Report Action -->
     <record id="action_report_subscription" model="ir.actions.report">
         <field name="name">Subscription Summary</field>
         <field name="model">subscription.subscription</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">subscription_management.report_subscription</field>
-        <field name="report_file">subscription_management.report_subscription</field>
-        <field name="print_report_name">'Subscription - %s' % (object.name or '').replace('/', '_')</field>
+        <field name="report_name">subscription_management.report_subscription_document</field>
+        <field name="report_file">subscription_management.report_subscription_document</field>
         <field name="binding_model_id" ref="model_subscription_subscription"/>
         <field name="binding_type">report</field>
     </record>
 
-    <!-- One subscription, rendered in the customer's language -->
+    <!-- Subscription Report QWeb Document Template -->
     <template id="report_subscription_document">
-        <t t-call="web.external_layout">
-            <t t-set="currency" t-value="doc.currency_id"/>
-            <t t-set="address">
-                <div t-field="doc.partner_id"
-                     t-options="{'widget': 'contact', 'fields': ['address', 'name', 'vat'], 'no_marker': True}"/>
-            </t>
-            <div class="page">
-                <h2>Subscription <span t-field="doc.name"/></h2>
-                <p class="text-muted">Status: <span t-field="doc.state"/></p>
-
-                <!-- Subscription & plan details -->
-                <div class="row mt-3 mb-4">
-                    <div class="col-6">
-                        <h5>Subscription Details</h5>
-                        <table class="table table-sm table-borderless">
-                            <tr><td><strong>Start Date</strong></td><td><span t-field="doc.start_date"/></td></tr>
-                            <tr t-if="doc.expiry_date"><td><strong>Expiry Date</strong></td><td><span t-field="doc.expiry_date"/></td></tr>
-                            <tr t-if="doc.next_billing_date and doc.state == 'active'">
-                                <td><strong>Next Billing Date</strong></td><td><span t-field="doc.next_billing_date"/></td>
-                            </tr>
-                            <tr><td><strong>Payment Terms</strong></td><td><span t-field="doc.payment_term"/></td></tr>
-                            <tr t-if="doc.user_id"><td><strong>Salesperson</strong></td><td><span t-field="doc.user_id"/></td></tr>
-                        </table>
-                    </div>
-                    <div class="col-6">
-                        <h5>Plan</h5>
-                        <table class="table table-sm table-borderless">
-                            <tr><td><strong>Plan</strong></td><td><span t-field="doc.plan_id.name"/></td></tr>
-                            <tr><td><strong>Billing Frequency</strong></td><td><span t-field="doc.plan_id.billing_frequency"/></td></tr>
-                            <tr>
-                                <td><strong>Options</strong></td>
-                                <td>
-                                    <t t-set="plan_options" t-value="[label for flag, label in [
-                                        (doc.plan_id.allow_pause, 'Pausable'),
-                                        (doc.plan_id.allow_renew, 'Renewable'),
-                                        (doc.plan_id.allow_early_close, 'Early termination allowed'),
-                                        (doc.plan_id.auto_close, 'Auto-closes on expiry'),
-                                    ] if flag]"/>
-                                    <span t-out="', '.join(plan_options) or '-'"/>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Line items -->
-                <h5>Products</h5>
-                <table class="table table-sm o_main_table">
-                    <thead>
-                        <tr>
-                            <th class="text-start">Product</th>
-                            <th class="text-end">Qty</th>
-                            <th class="text-end">Unit Price</th>
-                            <th class="text-end">Discount</th>
-                            <th class="text-start">Taxes</th>
-                            <th class="text-end">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="doc.subscription_line_ids" t-as="line">
-                            <td>
-                                <span t-field="line.product_id.name"/>
-                                <div t-if="line.variant_id" class="text-muted">
-                                    <span t-out="line.variant_id.variant_name"/>: <span t-out="line.variant_id.variant_value"/>
-                                    <t t-if="line.variant_id.price_extra">
-                                        (+<span t-field="line.variant_id.price_extra" t-options="{'widget': 'monetary', 'display_currency': currency}"/>)
-                                    </t>
-                                </div>
-                            </td>
-                            <td class="text-end"><span t-field="line.quantity"/></td>
-                            <td class="text-end">
-                                <span t-field="line.unit_price" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
-                            </td>
-                            <td class="text-end"><t t-if="line.discount"><span t-field="line.discount"/>%</t></td>
-                            <td><span t-out="', '.join(line.tax_ids.mapped('display_name'))"/></td>
-                            <td class="text-end"><span t-field="line.subtotal"/></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="row">
-                    <div class="col-6"/>
-                    <div class="col-6">
-                        <table class="table table-sm">
-                            <tr><td>Untaxed Amount</td><td class="text-end"><span t-field="doc.amount_untaxed"/></td></tr>
-                            <tr><td>Tax</td><td class="text-end"><span t-field="doc.amount_tax"/></td></tr>
-                            <tr class="fw-bold border-top border-dark">
-                                <td>Total per Billing Period</td><td class="text-end"><span t-field="doc.amount_total"/></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Billing history -->
-                <h5 class="mt-4">Billing History</h5>
-                <p t-if="not doc.invoice_ids" class="text-muted">No invoices yet.</p>
-                <table t-if="doc.invoice_ids" class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Invoice #</th>
-                            <th>Date</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th class="text-end">Total</th>
-                            <th class="text-end">Paid</th>
-                            <th class="text-end">Due</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="doc.invoice_ids.sorted('invoice_date')" t-as="inv">
-                            <td><span t-field="inv.name"/></td>
-                            <td><span t-field="inv.invoice_date"/></td>
-                            <td><span t-field="inv.due_date"/></td>
-                            <td><span t-field="inv.state"/></td>
-                            <td class="text-end"><span t-field="inv.amount_total"/></td>
-                            <td class="text-end"><span t-field="inv.amount_paid"/></td>
-                            <td class="text-end"><span t-if="inv.state != 'cancelled'" t-field="inv.amount_due"/></td>
-                        </tr>
-                    </tbody>
-                    <t t-set="billed" t-value="doc.invoice_ids.filtered(lambda i: i.state != 'cancelled')"/>
-                    <tfoot>
-                        <tr class="fw-bold">
-                            <td colspan="4">Total (excluding cancelled)</td>
-                            <td class="text-end"><span t-out="sum(billed.mapped('amount_total'))" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
-                            <td class="text-end"><span t-out="sum(billed.mapped('amount_paid'))" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
-                            <td class="text-end"><span t-out="sum(billed.mapped('amount_due'))" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </t>
-    </template>
-
-    <template id="report_subscription">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-set="o" t-value="doc"/>
-                <t t-set="lang" t-value="doc.partner_id.lang or user.lang"/>
-                <t t-call="subscription_management.report_subscription_document" t-lang="lang"/>
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif;">
+                        <div class="row mb-4">
+                            <div class="col-7">
+                                <h2 class="text-primary fw-bold">SUBSCRIPTION CONTRACT</h2>
+                                <h4><span t-field="doc.name"/></h4>
+                            </div>
+                            <div class="col-5 text-end">
+                                <strong>Plan:</strong> <span t-field="doc.plan_id.name"/><br/>
+                                <strong>Billing Cycle:</strong> <span t-field="doc.plan_id.billing_frequency"/><br/>
+                                <strong>Start Date:</strong> <span t-field="doc.start_date"/><br/>
+                                <strong>Next Billing Date:</strong> <span t-field="doc.next_billing_date"/><br/>
+                                <strong>Status:</strong> <span class="badge text-uppercase" t-field="doc.state"/>
+                            </div>
+                        </div>
+
+                        <div class="card p-3 mb-4 bg-light border-0">
+                            <strong>Subscriber Account:</strong>
+                            <h5 class="mb-1"><span t-field="doc.partner_id.name"/></h5>
+                            <span t-field="doc.partner_id.street"/><br/>
+                            <span t-field="doc.partner_id.city"/> <span t-field="doc.partner_id.zip"/><br/>
+                            <span>Email: <t t-esc="doc.partner_id.email or 'N/A'"/> | Phone: <t t-esc="doc.partner_id.phone or 'N/A'"/></span>
+                        </div>
+
+                        <h5 class="mb-3">Included Products &amp; Plan Lines</h5>
+                        <table class="table table-bordered mb-4">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Variant</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Discount</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.subscription_line_ids" t-as="line">
+                                    <tr>
+                                        <td><strong t-field="line.product_id.name"/></td>
+                                        <td><span t-field="line.variant_id.name"/></td>
+                                        <td class="text-end"><span t-field="line.quantity"/></td>
+                                        <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary"}'/></td>
+                                        <td class="text-end"><span t-field="line.discount"/>%</td>
+                                        <td class="text-end fw-bold"><span t-field="line.subtotal" t-options='{"widget": "monetary"}'/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div class="row justify-content-end mb-4">
+                            <div class="col-5">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td>Untaxed Total:</td>
+                                        <td class="text-end"><span t-field="doc.amount_untaxed" t-options='{"widget": "monetary"}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Taxes:</td>
+                                        <td class="text-end"><span t-field="doc.amount_tax" t-options='{"widget": "monetary"}'/></td>
+                                    </tr>
+                                    <tr class="border-top fw-bold fs-5">
+                                        <td>Recurring Total:</td>
+                                        <td class="text-end"><span t-field="doc.total_amount" t-options='{"widget": "monetary"}'/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div t-if="doc.notes" class="alert alert-secondary mt-3">
+                            <strong>Contract Conditions:</strong>
+                            <p class="mb-0" t-field="doc.notes"/>
+                        </div>
+                    </div>
+                </t>
             </t>
         </t>
     </template>
