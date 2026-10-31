@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Category -->
+    <record id="module_category_subscription" model="ir.module.category">
+        <field name="name">Subscription Management</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Groups -->
+
+    <!-- Kept out of the category: portal and internal groups are mutually exclusive, so mixing
+         them in one category would offer an invalid choice on the internal user form.
+         Portal access rights are granted to base.group_portal so customers given portal access
+         the standard way see their data without needing this group. -->
+    <record id="group_subscription_customer" model="res.groups">
+        <field name="name">Subscription Customer (Portal)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+    </record>
+
+    <record id="group_subscription_staff" model="res.groups">
+        <field name="name">Staff</field>
+        <field name="category_id" ref="module_category_subscription"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_subscription_admin" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_subscription"/>
+        <field name="implied_ids" eval="[(4, ref('group_subscription_staff'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

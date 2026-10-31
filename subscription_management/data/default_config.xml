@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate: created on install only, so admin edits survive module updates. -->
+    <data noupdate="1">
+        <!-- Default tax -->
+        <record id="tax_gst_18" model="subscription.tax">
+            <field name="name">GST 18%</field>
+            <field name="tax_type">percentage</field>
+            <field name="amount">18.0</field>
+            <field name="description">Goods and Services Tax at the standard 18% rate for software and IT services.</field>
+        </record>
+
+        <!-- Default payment terms note on new invoices (editable per invoice,
+             or globally via Settings > Technical > User-defined Defaults) -->
+        <function model="ir.default" name="set"
+                  eval="('subscription.invoice', 'note', 'Please pay by the due date shown above. Quote the invoice number as the payment reference.')"/>
+    </data>
+</odoo>

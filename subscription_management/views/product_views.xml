@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List -->
+    <record id="view_subscription_product_list" model="ir.ui.view">
+        <field name="name">subscription.product.list</field>
+        <field name="model">subscription.product</field>
+        <field name="arch" type="xml">
+            <list string="Products" decoration-muted="not is_active">
+                <field name="name"/>
+                <field name="product_type" widget="badge"
+                       decoration-info="product_type == 'software'"
+                       decoration-success="product_type == 'addon'"
+                       decoration-warning="product_type == 'service'"/>
+                <field name="sales_price"/>
+                <field name="cost_price" optional="show"/>
+                <field name="variant_count" string="Variants" optional="show"/>
+                <field name="is_active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form -->
+    <record id="view_subscription_product_form" model="ir.ui.view">
+        <field name="name">subscription.product.form</field>
+        <field name="model">subscription.product</field>
+        <field name="arch" type="xml">
+            <form string="Product">
+                <header/>
+                <sheet>
+                    <widget name="web_ribbon" title="Inactive" bg_color="text-bg-danger" invisible="is_active"/>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Odoo ERP Suite"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="product_type"/>
+                            <field name="is_active"/>
+                        </group>
+                        <group>
+                            <field name="sales_price"/>
+                            <field name="cost_price"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Variants" name="variants">
+                            <field name="variant_ids">
+                                <list editable="bottom">
+                                    <field name="variant_name" placeholder="e.g. Brand"/>
+                                    <field name="variant_value" placeholder="e.g. Odoo"/>
+                                    <field name="price_extra"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="notes" widget="html" placeholder="Describe the product..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban -->
+    <record id="view_subscription_product_kanban" model="ir.ui.view">
+        <field name="name">subscription.product.kanban</field>
+        <field name="model">subscription.product</field>
+        <field name="arch" type="xml">
+            <kanban string="Products">
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <aside class="o_kanban_aside_full">
+                            <field name="image" widget="image" class="d-block position-relative"
+                                   options="{'img_class': 'object-fit-contain w-100 h-100'}"/>
+                        </aside>
+                        <main class="ms-2">
+                            <field name="name" class="fw-bold fs-5"/>
+                            <div>
+                                <field name="product_type" widget="badge"/>
+                            </div>
+                            <div class="mt-1">
+                                Price: <field name="sales_price"/>
+                            </div>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_subscription_product_search" model="ir.ui.view">
+        <field name="name">subscription.product.search</field>
+        <field name="model">subscription.product</field>
+        <field name="arch" type="xml">
+            <search string="Products">
+                <field name="name"/>
+                <separator/>
+                <filter string="Software" name="filter_software" domain="[('product_type', '=', 'software')]"/>
+                <filter string="Add-ons" name="filter_addon" domain="[('product_type', '=', 'addon')]"/>
+                <filter string="Services" name="filter_service" domain="[('product_type', '=', 'service')]"/>
+                <separator/>
+                <filter string="Active" name="filter_active" domain="[('is_active', '=', True)]"/>
+                <filter string="Archived" name="filter_archived" domain="[('is_active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Product Type" name="group_product_type" context="{'group_by': 'product_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
