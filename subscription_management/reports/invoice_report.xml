@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Action -->
+    <record id="action_report_invoice" model="ir.actions.report">
+        <field name="name">Invoice</field>
+        <field name="model">subscription.invoice</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">subscription_management.report_invoice</field>
+        <field name="report_file">subscription_management.report_invoice</field>
+        <field name="print_report_name">'Invoice - %s' % (object.name or '').replace('/', '_')</field>
+        <field name="binding_model_id" ref="model_subscription_invoice"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- One invoice, rendered in the customer's language -->
+    <template id="report_invoice_document">
+        <t t-call="web.external_layout">
+            <t t-set="currency" t-value="doc.currency_id"/>
+            <t t-set="address">
+                <div t-field="doc.partner_id"
+                     t-options="{'widget': 'contact', 'fields': ['address', 'name', 'vat'], 'no_marker': True}"/>
+            </t>
+            <div class="page">
+                <h2>
+                    <span t-if="doc.state == 'cancelled'">Cancelled </span>
+                    <span t-elif="doc.state == 'draft'">Draft </span>
+                    Invoice <span t-field="doc.name"/>
+                </h2>
+
+                <div class="row mt-4 mb-4">
+                    <div class="col-4">
+                        <strong>Invoice Date</strong>
+                        <div t-field="doc.invoice_date"/>
+                    </div>
+                    <div class="col-4" t-if="doc.due_date">
+                        <strong>Due Date</strong>
+                        <div t-field="doc.due_date"/>
+                    </div>
+                    <div class="col-4" t-if="doc.subscription_id">
+                        <strong>Subscription</strong>
+                        <div t-field="doc.subscription_id.name"/>
+                    </div>
+                </div>
+
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Description</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Discount</th>
+                            <th class="text-start">Taxes</th>
+                            <th class="text-end">Tax</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.invoice_line_ids" t-as="line">
+                            <td>
+                                <span t-field="line.product_id.name"/>
+                                <div t-if="line.description and line.description != line.product_id.name"
+                                     class="text-muted" t-field="line.description"/>
+                            </td>
+                            <td class="text-end"><span t-field="line.quantity"/></td>
+                            <td class="text-end">
+                                <span t-field="line.unit_price" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-if="line.discount_amount" t-field="line.discount_amount"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td><span t-out="', '.join(line.tax_ids.mapped('display_name'))"/></td>
+                            <td class="text-end"><span t-field="line.tax_amount"/></td>
+                            <td class="text-end"><span t-field="line.total"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-6"/>
+                    <div class="col-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Subtotal</td>
+                                <td class="text-end"><span t-field="doc.amount_untaxed"/></td>
+                            </tr>
+                            <tr>
+                                <td>Tax</td>
+                                <td class="text-end"><span t-field="doc.amount_tax"/></td>
+                            </tr>
+                            <tr class="fw-bold border-top border-dark">
+                                <td>Total</td>
+                                <td class="text-end"><span t-field="doc.amount_total"/></td>
+                            </tr>
+                            <tr t-if="doc.amount_paid">
+                                <td>Amount Paid</td>
+                                <td class="text-end"><span t-field="doc.amount_paid"/></td>
+                            </tr>
+                            <tr class="fw-bold" t-if="doc.state != 'cancelled'">
+                                <td>Amount Due</td>
+                                <td class="text-end"><span t-field="doc.amount_due"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <t t-if="doc.payment_ids">
+                    <h5 class="mt-4">Payments Received</h5>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.payment_ids" t-as="payment">
+                                <td><span t-field="payment.payment_date"/></td>
+                                <td><span t-field="payment.payment_method"/></td>
+                                <td><span t-out="payment.reference or ''"/></td>
+                                <td class="text-end"><span t-field="payment.amount"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+
+                <p t-if="doc.note" class="mt-4" t-field="doc.note"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_invoice">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="o" t-value="doc"/>
+                <t t-set="lang" t-value="doc.partner_id.lang or user.lang"/>
+                <t t-call="subscription_management.report_invoice_document" t-lang="lang"/>
+            </t>
+        </t>
+    </template>
+</odoo>

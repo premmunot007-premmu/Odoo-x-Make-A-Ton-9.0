@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal: customers see only records of their own company (commercial partner),
+         so contacts of the same customer company share visibility, as in Odoo's sales portal. -->
+
+    <record id="subscription_portal_rule" model="ir.rule">
+        <field name="name">Portal: Own Subscriptions Only</field>
+        <field name="model_id" ref="model_subscription_subscription"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('partner_id', 'child_of', [user.commercial_partner_id.id])]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="subscription_line_portal_rule" model="ir.rule">
+        <field name="name">Portal: Own Subscription Lines Only</field>
+        <field name="model_id" ref="model_subscription_subscription_line"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('subscription_id.partner_id', 'child_of', [user.commercial_partner_id.id])]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="invoice_portal_rule" model="ir.rule">
+        <field name="name">Portal: Own Invoices Only</field>
+        <field name="model_id" ref="model_subscription_invoice"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('partner_id', 'child_of', [user.commercial_partner_id.id])]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="invoice_line_portal_rule" model="ir.rule">
+        <field name="name">Portal: Own Invoice Lines Only</field>
+        <field name="model_id" ref="model_subscription_invoice_line"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('invoice_id.partner_id', 'child_of', [user.commercial_partner_id.id])]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="payment_portal_rule" model="ir.rule">
+        <field name="name">Portal: Own Payments Only</field>
+        <field name="model_id" ref="model_subscription_payment"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('invoice_id.partner_id', 'child_of', [user.commercial_partner_id.id])]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Staff and Admin: no rule needed; without a matching rule they see all records. -->
+</odoo>
