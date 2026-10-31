@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List -->
+    <record id="view_subscription_list" model="ir.ui.view">
+        <field name="name">subscription.subscription.list</field>
+        <field name="model">subscription.subscription</field>
+        <field name="arch" type="xml">
+            <list string="Subscriptions"
+                  decoration-success="state == 'active'"
+                  decoration-info="state in ('confirmed', 'quotation')"
+                  decoration-muted="state == 'closed'"
+                  decoration-warning="state == 'paused'">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="plan_id"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="hide"/>
+                <field name="start_date"/>
+                <field name="expiry_date"/>
+                <field name="next_billing_date" optional="show"/>
+                <field name="amount_total" widget="monetary" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-info="state in ('confirmed', 'quotation')"
+                       decoration-warning="state == 'paused'"
+                       decoration-muted="state in ('draft', 'closed')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form -->
+    <record id="view_subscription_form" model="ir.ui.view">
+        <field name="name">subscription.subscription.form</field>
+        <field name="model">subscription.subscription</field>
+        <field name="arch" type="xml">
+            <form string="Subscription">
+                <header>
+                    <button name="action_send_quotation" string="Send Quotation" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="Confirm" type="object" invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary" invisible="state != 'quotation'"/>
+                    <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="action_create_invoice" string="Create Invoice" type="object" class="btn-primary" invisible="state != 'active'"/>
+                    <button name="action_pause" string="Pause" type="object" invisible="state != 'active'"/>
+                    <button name="action_activate" string="Resume" type="object" class="btn-primary" invisible="state != 'paused'"/>
+                    <button name="action_renew" string="Renew" type="object" invisible="state not in ('active', 'paused', 'closed')"/>
+                    <button name="action_close" string="Close" type="object" invisible="state in ('closed', 'draft')"
+                            confirm="Close this subscription? It will no longer be billed."/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,quotation,confirmed,active,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Expired" bg_color="text-bg-danger" invisible="not is_expired or state == 'closed'"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="is_expired" invisible="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="state == 'closed'"/>
+                            <field name="plan_id" readonly="state == 'closed'"/>
+                            <label for="template_id"/>
+                            <div class="o_row">
+                                <field name="template_id" readonly="state not in ('draft', 'quotation')"/>
+                                <button name="action_load_template" string="Load Template" type="object" class="btn-link"
+                                        invisible="not template_id or state not in ('draft', 'quotation')"
+                                        confirm="This replaces the current subscription lines. Continue?"/>
+                            </div>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group>
+                            <field name="start_date" readonly="state == 'closed'"/>
+                            <field name="expiry_date" readonly="state == 'closed'"/>
+                            <field name="next_billing_date" readonly="state == 'closed'"/>
+                            <field name="payment_term" readonly="state == 'closed'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Subscription Lines" name="lines">
+                            <field name="subscription_line_ids" readonly="state == 'closed'">
+                                <list editable="bottom">
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="product_id" domain="[('is_active', '=', True)]"/>
+                                    <field name="variant_id" optional="show" options="{'no_create': True}"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="tax_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                    <field name="discount"/>
+                                    <field name="subtotal" sum="Total"/>
+                                    <field name="tax_amount" sum="Tax" optional="show"/>
+                                    <field name="total" sum="Grand Total"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="amount_untaxed" widget="monetary"/>
+                                <field name="amount_tax" widget="monetary"/>
+                                <field name="amount_total" widget="monetary" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Invoices" name="invoices" invisible="invoice_count == 0">
+                            <field name="invoice_ids" readonly="1">
+                                <list>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="invoice_date"/>
+                                    <field name="due_date"/>
+                                    <field name="amount_total" widget="monetary"/>
+                                    <field name="payment_status" widget="badge"
+                                           decoration-success="payment_status == 'paid'"
+                                           decoration-warning="payment_status == 'partial'"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'paid'"
+                                           decoration-info="state == 'confirmed'"
+                                           decoration-muted="state == 'cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban -->
+    <record id="view_subscription_kanban" model="ir.ui.view">
+        <field name="name">subscription.subscription.kanban</field>
+        <field name="model">subscription.subscription</field>
+        <field name="arch" type="xml">
+            <!-- Not draggable: moving a card between columns would change state without the button checks. -->
+            <kanban default_group_by="state" records_draggable="0" group_create="0" class="o_kanban_small_column">
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <field name="name" class="fw-bold"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'active'"
+                                   decoration-info="state in ('confirmed', 'quotation')"
+                                   decoration-warning="state == 'paused'"
+                                   decoration-muted="state in ('draft', 'closed')"/>
+                        </div>
+                        <field name="partner_id"/>
+                        <field name="plan_id" class="text-muted"/>
+                        <footer class="pt-1">
+                            <div class="d-flex align-items-center text-muted small">
+                                <i class="fa fa-calendar me-1" title="Next billing date"/>
+                                <field name="next_billing_date"/>
+                            </div>
+                            <field name="amount_total" widget="monetary" class="ms-auto fw-bold"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_subscription_search" model="ir.ui.view">
+        <field name="name">subscription.subscription.search</field>
+        <field name="model">subscription.subscription</field>
+        <field name="arch" type="xml">
+            <search string="Subscriptions">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="plan_id"/>
+                <separator/>
+                <filter string="My Subscriptions" name="my_subscriptions" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Active" name="filter_active" domain="[('state', '=', 'active')]"/>
+                <filter string="Closed" name="filter_closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Expiring Soon" name="filter_expiring_soon"
+                        domain="[('state', 'in', ('active', 'paused')),
+                                 ('expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('expiry_date', '&lt;=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Expired" name="filter_expired" domain="[('is_expired', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
+                    <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Salesperson" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Start Month" name="group_start_month" context="{'group_by': 'start_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="subscription_management.Dashboard">
+        <div class="o_subscription_dashboard container-fluid py-4 h-100 overflow-auto">
+            <h2 class="mb-4">Subscription Dashboard</h2>
+
+            <!-- KPI Cards Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card bg-primary text-white shadow cursor-pointer h-100" t-on-click="openActiveSubscriptions">
+                        <div class="card-body text-center">
+                            <h5>Active Subscriptions</h5>
+                            <div class="o_kpi_value" t-esc="state.activeSubscriptions"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card bg-success text-white shadow cursor-pointer h-100" t-on-click="openPayments">
+                        <div class="card-body text-center">
+                            <h5>Collected This Month</h5>
+                            <div class="o_kpi_value" t-esc="formatAmount(state.collectedThisMonth)"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card bg-warning text-dark shadow cursor-pointer h-100" t-on-click="openOutstandingInvoices">
+                        <div class="card-body text-center">
+                            <h5>Outstanding</h5>
+                            <div class="o_kpi_value" t-esc="formatAmount(state.outstandingAmount)"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card bg-danger text-white shadow cursor-pointer h-100" t-on-click="openOverdueInvoices">
+                        <div class="card-body text-center">
+                            <h5>Overdue Invoices</h5>
+                            <div class="o_kpi_value" t-esc="state.overdueInvoices"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <!-- Monthly collections trend -->
+                <div class="col-12 col-lg-7">
+                    <div class="card shadow h-100">
+                        <div class="card-header"><h5 class="mb-0">Payments Collected (Last 6 Months)</h5></div>
+                        <div class="card-body">
+                            <div class="o_revenue_chart d-flex align-items-end gap-2">
+                                <t t-foreach="state.monthlyRevenue" t-as="month" t-key="month.label">
+                                    <div class="o_revenue_bar_col d-flex flex-column align-items-center flex-fill h-100 justify-content-end">
+                                        <small class="text-muted mb-1 text-nowrap" t-esc="formatAmount(month.amount)"/>
+                                        <div class="o_revenue_bar bg-success w-100"
+                                             t-att-style="'height: ' + barHeight(month.amount) + '%'"
+                                             t-att-title="month.label + ': ' + formatAmount(month.amount)"/>
+                                        <small class="mt-1 text-nowrap" t-esc="month.label"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Distribution -->
+                <div class="col-12 col-lg-5">
+                    <div class="card shadow h-100">
+                        <div class="card-header"><h5 class="mb-0">Subscription Status</h5></div>
+                        <div class="card-body">
+                            <table class="table table-hover mb-0">
+                                <thead><tr><th>Status</th><th class="text-end">Count</th><th class="w-50">Share</th></tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.statusDistribution" t-as="item" t-key="item.state">
+                                        <tr class="cursor-pointer" t-on-click="() => this.openSubscriptionsByState(item.state, item.label)">
+                                            <td t-esc="item.label"/>
+                                            <td class="text-end" t-esc="item.count"/>
+                                            <td class="align-middle">
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar" t-att-style="'width: ' + statusShare(item.count) + '%'"/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

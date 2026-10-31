@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List -->
+    <record id="view_subscription_payment_list" model="ir.ui.view">
+        <field name="name">subscription.payment.list</field>
+        <field name="model">subscription.payment</field>
+        <field name="arch" type="xml">
+            <list string="Payments">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="payment_date"/>
+                <field name="name" optional="hide"/>
+                <field name="invoice_id"/>
+                <field name="partner_id"/>
+                <field name="payment_method" widget="badge"/>
+                <field name="amount" widget="monetary" sum="Total"/>
+                <field name="reference" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form (also used as the "Register Payment" dialog) -->
+    <record id="view_subscription_payment_form" model="ir.ui.view">
+        <field name="name">subscription.payment.form</field>
+        <field name="model">subscription.payment</field>
+        <field name="arch" type="xml">
+            <form string="Payment">
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <div class="oe_title" invisible="not id">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="invoice_id" options="{'no_create': True}"/>
+                            <field name="partner_id"/>
+                            <field name="payment_method"/>
+                        </group>
+                        <group>
+                            <field name="amount" widget="monetary"/>
+                            <field name="payment_date"/>
+                            <field name="reference" placeholder="e.g. UPI transaction ID, cheque number"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Payment note..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_subscription_payment_search" model="ir.ui.view">
+        <field name="name">subscription.payment.search</field>
+        <field name="model">subscription.payment</field>
+        <field name="arch" type="xml">
+            <search string="Payments">
+                <field name="invoice_id"/>
+                <field name="partner_id"/>
+                <field name="reference"/>
+                <separator/>
+                <filter string="Bank Transfer" name="filter_bank_transfer" domain="[('payment_method', '=', 'bank_transfer')]"/>
+                <filter string="Credit Card" name="filter_credit_card" domain="[('payment_method', '=', 'credit_card')]"/>
+                <filter string="UPI" name="filter_upi" domain="[('payment_method', '=', 'upi')]"/>
+                <filter string="Cash" name="filter_cash" domain="[('payment_method', '=', 'cash')]"/>
+                <filter string="Cheque" name="filter_cheque" domain="[('payment_method', '=', 'cheque')]"/>
+                <separator/>
+                <filter string="Payment Date" name="filter_payment_date" date="payment_date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Payment Method" name="group_method" context="{'group_by': 'payment_method'}"/>
+                    <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Month" name="group_month" context="{'group_by': 'payment_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
