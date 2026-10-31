@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_subscription_payment_wizard_form" model="ir.ui.view">
+        <field name="name">subscription.payment.wizard.form</field>
+        <field name="model">subscription.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Register Payment">
+                <group>
+                    <group string="Invoice Summary">
+                        <field name="invoice_id" readonly="1"/>
+                        <field name="partner_id"/>
+                        <field name="amount_due" widget="monetary"/>
+                    </group>
+                    <group string="Transaction Details">
+                        <field name="amount" widget="monetary"/>
+                        <field name="payment_method"/>
+                        <field name="payment_date"/>
+                        <field name="reference" placeholder="e.g. HDFC-NEFT-12345 or UPI ref"/>
+                    </group>
+                </group>
+                <field name="note" placeholder="Optional internal notes or transaction remarks..."/>
+                <footer>
+                    <button name="action_confirm_payment" string="Create Payment" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_payment_wizard" model="ir.actions.act_window">
+        <field name="name">Register Payment</field>
+        <field name="res_model">subscription.payment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

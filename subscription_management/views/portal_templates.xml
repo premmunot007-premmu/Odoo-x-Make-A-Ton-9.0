@@ -1,436 +1,268 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ============================================================
-         Portal home: "Subscriptions" and "Subscription Invoices" entries
-         (counts are fetched via _prepare_home_portal_values)
-         ============================================================ -->
-    <template id="portal_my_home_subscription" name="Show Subscriptions" customize_show="True"
-              inherit_id="portal.portal_my_home" priority="40">
-        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
-            <t t-set="portal_client_category_enable" t-value="True"/>
-        </xpath>
-        <div id="portal_client_category" position="inside">
+    <!-- Portal Home Navigation Cards Integration -->
+    <template id="portal_my_home_subscription" name="Portal Home: Subscriptions"
+              inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
-                <t t-set="icon" t-value="'/subscription_management/static/description/icon.png'"/>
-                <t t-set="title">My Subscriptions</t>
+                <t t-set="title">Subscriptions</t>
                 <t t-set="url" t-value="'/my/subscriptions'"/>
-                <t t-set="text">View your subscriptions, plans and renewal dates</t>
                 <t t-set="placeholder_count" t-value="'subscription_count'"/>
             </t>
             <t t-call="portal.portal_docs_entry">
-                <t t-set="icon" t-value="'/subscription_management/static/description/icon.png'"/>
-                <t t-set="title">My Invoices</t>
-                <t t-set="url" t-value="'/my/subscription-invoices'"/>
-                <t t-set="text">View your subscription invoices and payments</t>
-                <t t-set="placeholder_count" t-value="'subscription_invoice_count'"/>
-            </t>
-        </div>
-    </template>
-
-    <!-- ============================================================
-         Breadcrumbs
-         ============================================================ -->
-    <template id="portal_breadcrumbs_subscription" name="Subscription Portal Breadcrumbs"
-              inherit_id="portal.portal_breadcrumbs" priority="40">
-        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-            <li t-if="page_name == 'subscriptions'" class="breadcrumb-item active">Subscriptions</li>
-            <t t-if="page_name == 'subscription'">
-                <li class="breadcrumb-item"><a href="/my/subscriptions">Subscriptions</a></li>
-                <li class="breadcrumb-item active" t-out="subscription.name"/>
-            </t>
-            <li t-if="page_name == 'subscription_invoices'" class="breadcrumb-item active">Invoices</li>
-            <t t-if="page_name == 'subscription_invoice'">
-                <li class="breadcrumb-item"><a href="/my/subscription-invoices">Invoices</a></li>
-                <li class="breadcrumb-item active" t-out="invoice.name"/>
+                <t t-set="title">Invoices</t>
+                <t t-set="url" t-value="'/my/invoices'"/>
+                <t t-set="placeholder_count" t-value="'invoice_count'"/>
             </t>
         </xpath>
     </template>
 
-    <!-- ============================================================
-         Status badges (shared)
-         ============================================================ -->
-    <template id="portal_subscription_state_badge" name="Subscription Status Badge">
-        <t t-set="badge_class" t-value="{
-            'draft': 'text-bg-secondary',
-            'quotation': 'text-bg-info',
-            'confirmed': 'text-bg-primary',
-            'active': 'text-bg-success',
-            'paused': 'text-bg-warning',
-            'closed': 'text-bg-dark',
-        }.get(record.state, 'text-bg-light')"/>
-        <span t-attf-class="badge rounded-pill #{badge_class}" t-field="record.state"/>
-    </template>
-
-    <template id="portal_invoice_state_badge" name="Invoice Status Badge">
-        <t t-if="record.state == 'cancelled'">
-            <span class="badge rounded-pill text-bg-secondary">Cancelled</span>
-        </t>
-        <t t-elif="record.payment_status == 'paid'">
-            <span class="badge rounded-pill text-bg-success">Paid</span>
-        </t>
-        <t t-elif="record.is_overdue">
-            <span class="badge rounded-pill text-bg-danger">Overdue</span>
-        </t>
-        <t t-elif="record.payment_status == 'partial'">
-            <span class="badge rounded-pill text-bg-warning">Partially Paid</span>
-        </t>
-        <t t-else="">
-            <span class="badge rounded-pill text-bg-info">Awaiting Payment</span>
-        </t>
-    </template>
-
-    <!-- ============================================================
-         My Subscriptions (list)
-         ============================================================ -->
+    <!-- Subscriptions List Template -->
     <template id="portal_my_subscriptions" name="My Subscriptions">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Subscriptions</t>
             </t>
-            <div t-if="not subscriptions" class="alert alert-info mt-3">
-                You don't have any subscriptions yet.
-            </div>
-            <t t-if="subscriptions" t-call="portal.portal_table">
-                <thead>
-                    <tr class="active">
-                        <th>Subscription #</th>
-                        <th class="d-none d-md-table-cell">Plan</th>
-                        <th class="d-none d-md-table-cell">Start Date</th>
-                        <th class="d-none d-lg-table-cell">Next Billing</th>
-                        <th class="d-none d-lg-table-cell">Expiry Date</th>
-                        <th class="text-end">Amount</th>
-                        <th class="text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr t-foreach="subscriptions" t-as="sub">
-                        <td><a t-att-href="sub.get_portal_url()" t-out="sub.name"/></td>
-                        <td class="d-none d-md-table-cell" t-field="sub.plan_id"/>
-                        <td class="d-none d-md-table-cell" t-field="sub.start_date"/>
-                        <td class="d-none d-lg-table-cell" t-field="sub.next_billing_date"/>
-                        <td class="d-none d-lg-table-cell" t-field="sub.expiry_date"/>
-                        <td class="text-end" t-field="sub.amount_total"/>
-                        <td class="text-center">
-                            <t t-call="subscription_management.portal_subscription_state_badge">
-                                <t t-set="record" t-value="sub"/>
+            <div class="o_portal_subscription">
+                <t t-if="not subscriptions">
+                    <p class="alert alert-info mt-3">You currently have no active or past subscriptions.</p>
+                </t>
+                <t t-if="subscriptions">
+                    <table class="table line_table mt-3">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Start Date</th>
+                                <th>Next Billing</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="subscriptions" t-as="sub">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/subscriptions/#{sub.id}">
+                                            <strong t-esc="sub.name"/>
+                                        </a>
+                                    </td>
+                                    <td><span t-esc="sub.plan_id.name"/></td>
+                                    <td>
+                                        <span t-attf-class="badge sub_status_badge badge_state_#{sub.state}" t-esc="sub.state"/>
+                                    </td>
+                                    <td><span t-field="sub.start_date"/></td>
+                                    <td><span t-field="sub.next_billing_date"/></td>
+                                    <td class="text-end">
+                                        <span t-field="sub.total_amount" t-options='{"widget": "monetary", "display_currency": sub.currency_id}'/>
+                                    </td>
+                                </tr>
                             </t>
-                        </td>
-                    </tr>
-                </tbody>
-            </t>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
         </t>
     </template>
 
-    <!-- ============================================================
-         Subscription detail
-         ============================================================ -->
+    <!-- Subscription Detail Template -->
     <template id="portal_subscription_detail" name="Subscription Detail">
         <t t-call="portal.portal_layout">
-            <t t-set="o_portal_fullwidth_alert" groups="subscription_management.group_subscription_staff">
-                <t t-call="portal.portal_back_in_edit_mode">
-                    <t t-set="backend_url" t-value="'/odoo/action-subscription_management.action_subscription/%s' % subscription.id"/>
-                </t>
-            </t>
-            <div class="card mt-3">
-                <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <h4 class="mb-0">
-                        Subscription <span t-out="subscription.name"/>
-                    </h4>
-                    <t t-call="subscription_management.portal_subscription_state_badge">
-                        <t t-set="record" t-value="subscription"/>
-                    </t>
+            <div class="o_portal_subscription py-3">
+                <div class="sub_header_card d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>Subscription <span t-esc="subscription.name"/></h2>
+                        <span class="text-white-50">Plan: <strong class="text-white" t-esc="subscription.plan_id.name"/></span>
+                    </div>
+                    <div>
+                        <span t-attf-class="badge sub_status_badge badge_state_#{subscription.state}" t-esc="subscription.state"/>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-12 col-md-6">
-                            <strong>Customer</strong>
-                            <div t-field="subscription.partner_id"
-                                 t-options="{'widget': 'contact', 'fields': ['name', 'address', 'email'], 'no_marker': True}"/>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <dl class="row mb-0">
-                                <dt class="col-6">Plan</dt>
-                                <dd class="col-6">
-                                    <span t-field="subscription.plan_id"/>
-                                    (<span t-field="subscription.plan_id.billing_frequency"/>)
-                                </dd>
-                                <dt class="col-6">Start Date</dt>
-                                <dd class="col-6" t-field="subscription.start_date"/>
-                                <t t-if="subscription.expiry_date">
-                                    <dt class="col-6">Expiry Date</dt>
-                                    <dd class="col-6" t-field="subscription.expiry_date"/>
-                                </t>
-                                <t t-if="subscription.next_billing_date and subscription.state == 'active'">
-                                    <dt class="col-6">Next Billing Date</dt>
-                                    <dd class="col-6" t-field="subscription.next_billing_date"/>
-                                </t>
-                                <dt class="col-6">Payment Terms</dt>
-                                <dd class="col-6" t-field="subscription.payment_term"/>
-                            </dl>
-                        </div>
-                    </div>
 
-                    <h5>Products</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th class="text-end">Quantity</th>
-                                    <th class="text-end">Unit Price</th>
-                                    <th class="text-end d-none d-md-table-cell">Discount</th>
-                                    <th class="d-none d-md-table-cell">Taxes</th>
-                                    <th class="text-end">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="subscription.subscription_line_ids" t-as="line">
-                                    <td>
-                                        <span t-field="line.product_id"/>
-                                        <div t-if="line.variant_id" class="text-muted small">
-                                            <span t-out="line.variant_id.variant_name"/>: <span t-out="line.variant_id.variant_value"/>
-                                        </div>
-                                    </td>
-                                    <td class="text-end" t-field="line.quantity"/>
-                                    <td class="text-end">
-                                        <span t-field="line.unit_price"/>
-                                        <div t-if="line.variant_id.price_extra" class="text-muted small">
-                                            + <span t-field="line.variant_id.price_extra"/>
-                                        </div>
-                                    </td>
-                                    <td class="text-end d-none d-md-table-cell">
-                                        <t t-if="line.discount"><span t-field="line.discount"/>%</t>
-                                    </td>
-                                    <td class="d-none d-md-table-cell" t-out="', '.join(line.tax_ids.mapped('name'))"/>
-                                    <td class="text-end" t-field="line.subtotal"/>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="row justify-content-end">
-                        <div class="col-12 col-md-5">
-                            <table class="table table-sm">
-                                <tr>
-                                    <td>Untaxed Amount</td>
-                                    <td class="text-end" t-field="subscription.amount_untaxed"/>
-                                </tr>
-                                <tr>
-                                    <td>Taxes</td>
-                                    <td class="text-end" t-field="subscription.amount_tax"/>
-                                </tr>
-                                <tr class="fw-bold border-top">
-                                    <td>Total</td>
-                                    <td class="text-end" t-field="subscription.amount_total"/>
-                                </tr>
-                            </table>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card p-3 border-0 shadow-sm rounded-3">
+                            <h6 class="text-muted text-uppercase mb-2">Billing Details</h6>
+                            <div><strong>Start Date:</strong> <span t-field="subscription.start_date"/></div>
+                            <div><strong>Next Billing Date:</strong> <span t-field="subscription.next_billing_date"/></div>
+                            <div><strong>Payment Terms:</strong> <span t-field="subscription.payment_term"/></div>
                         </div>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card p-3 border-0 shadow-sm rounded-3">
+                            <h6 class="text-muted text-uppercase mb-2">Subscriber Information</h6>
+                            <div><strong>Company:</strong> <span t-esc="subscription.partner_id.name"/></div>
+                            <div><strong>Email:</strong> <span t-esc="subscription.partner_id.email"/></div>
+                            <div><strong>Phone:</strong> <span t-esc="subscription.partner_id.phone"/></div>
+                        </div>
+                    </div>
+                </div>
 
-                    <t t-set="visible_invoices" t-value="subscription.invoice_ids.filtered(lambda i: i.state != 'draft')"/>
-                    <t t-if="visible_invoices">
-                        <h5 class="mt-4">Invoices</h5>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Invoice #</th>
-                                        <th>Date</th>
-                                        <th class="d-none d-md-table-cell">Due Date</th>
-                                        <th class="text-end">Amount</th>
-                                        <th class="text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr t-foreach="visible_invoices" t-as="inv">
-                                        <td><a t-att-href="inv.get_portal_url()" t-out="inv.name"/></td>
-                                        <td t-field="inv.invoice_date"/>
-                                        <td class="d-none d-md-table-cell" t-field="inv.due_date"/>
-                                        <td class="text-end" t-field="inv.amount_total"/>
-                                        <td class="text-center">
-                                            <t t-call="subscription_management.portal_invoice_state_badge">
-                                                <t t-set="record" t-value="inv"/>
-                                            </t>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <h5 class="mb-3">Included Products &amp; Services</h5>
+                <table class="table line_table mb-4">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Variant</th>
+                            <th class="text-end">Quantity</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Discount</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="subscription.subscription_line_ids" t-as="line">
+                            <tr>
+                                <td><strong t-esc="line.product_id.name"/></td>
+                                <td><span t-esc="line.variant_id.name if line.variant_id else '-'"/></td>
+                                <td class="text-end"><span t-esc="line.quantity"/></td>
+                                <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": subscription.currency_id}'/></td>
+                                <td class="text-end"><span t-esc="line.discount"/>%</td>
+                                <td class="text-end"><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": subscription.currency_id}'/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div class="row justify-content-end mb-4">
+                    <div class="col-md-5">
+                        <div class="totals_box">
+                            <div class="total_row">
+                                <span>Subtotal Untaxed:</span>
+                                <span><field t-field="subscription.amount_untaxed" t-options='{"widget": "monetary", "display_currency": subscription.currency_id}'/></span>
+                            </div>
+                            <div class="total_row">
+                                <span>Taxes:</span>
+                                <span><field t-field="subscription.amount_tax" t-options='{"widget": "monetary", "display_currency": subscription.currency_id}'/></span>
+                            </div>
+                            <div class="total_row grand_total">
+                                <span>Total Recurring:</span>
+                                <span><field t-field="subscription.total_amount" t-options='{"widget": "monetary", "display_currency": subscription.currency_id}'/></span>
+                            </div>
                         </div>
-                    </t>
+                    </div>
                 </div>
             </div>
         </t>
     </template>
 
-    <!-- ============================================================
-         My Invoices (list)
-         ============================================================ -->
-    <template id="portal_my_invoices" name="My Subscription Invoices">
+    <!-- Invoices List Template -->
+    <template id="portal_my_invoices" name="My Invoices">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
             <t t-call="portal.portal_searchbar">
                 <t t-set="title">Invoices</t>
             </t>
-            <div t-if="not invoices" class="alert alert-info mt-3">
-                You don't have any invoices yet.
-            </div>
-            <t t-if="invoices" t-call="portal.portal_table">
-                <thead>
-                    <tr class="active">
-                        <th>Invoice #</th>
-                        <th class="d-none d-md-table-cell">Subscription</th>
-                        <th>Date</th>
-                        <th class="d-none d-md-table-cell">Due Date</th>
-                        <th class="text-end">Amount</th>
-                        <th class="text-end d-none d-lg-table-cell">Amount Due</th>
-                        <th class="text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr t-foreach="invoices" t-as="inv">
-                        <td><a t-att-href="inv.get_portal_url()" t-out="inv.name"/></td>
-                        <td class="d-none d-md-table-cell" t-out="inv.subscription_id.name"/>
-                        <td t-field="inv.invoice_date"/>
-                        <td class="d-none d-md-table-cell" t-field="inv.due_date"/>
-                        <td class="text-end" t-field="inv.amount_total"/>
-                        <td class="text-end d-none d-lg-table-cell" t-field="inv.amount_due"/>
-                        <td class="text-center">
-                            <t t-call="subscription_management.portal_invoice_state_badge">
-                                <t t-set="record" t-value="inv"/>
+            <div class="o_portal_subscription">
+                <t t-if="not invoices">
+                    <p class="alert alert-info mt-3">There are currently no invoices issued to your account.</p>
+                </t>
+                <t t-if="invoices">
+                    <table class="table line_table mt-3">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Invoice Date</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-end">Amount Due</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="invoices" t-as="inv">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/invoices/#{inv.id}">
+                                            <strong t-esc="inv.name"/>
+                                        </a>
+                                    </td>
+                                    <td><span t-field="inv.invoice_date"/></td>
+                                    <td><span t-field="inv.due_date"/></td>
+                                    <td>
+                                        <span t-attf-class="badge sub_status_badge badge_state_#{inv.state}" t-esc="inv.state"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="inv.total_amount" t-options='{"widget": "monetary", "display_currency": inv.currency_id}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="inv.amount_due" t-options='{"widget": "monetary", "display_currency": inv.currency_id}'/>
+                                    </td>
+                                </tr>
                             </t>
-                        </td>
-                    </tr>
-                </tbody>
-            </t>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
         </t>
     </template>
 
-    <!-- ============================================================
-         Invoice detail
-         ============================================================ -->
-    <template id="portal_invoice_detail" name="Subscription Invoice Detail">
+    <!-- Invoice Detail Template -->
+    <template id="portal_invoice_detail" name="Invoice Detail">
         <t t-call="portal.portal_layout">
-            <t t-set="o_portal_fullwidth_alert" groups="subscription_management.group_subscription_staff">
-                <t t-call="portal.portal_back_in_edit_mode">
-                    <t t-set="backend_url" t-value="'/odoo/action-subscription_management.action_invoice/%s' % invoice.id"/>
-                </t>
-            </t>
-            <div class="card mt-3">
-                <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <h4 class="mb-0">
-                        Invoice <span t-out="invoice.name"/>
-                    </h4>
-                    <div class="d-flex align-items-center gap-2">
-                        <t t-call="subscription_management.portal_invoice_state_badge">
-                            <t t-set="record" t-value="invoice"/>
-                        </t>
-                        <a class="btn btn-sm btn-secondary" title="Download PDF"
-                           t-att-href="invoice.get_portal_url(report_type='pdf', download=True)">
-                            <i class="fa fa-download me-1"/>Download PDF
-                        </a>
+            <div class="o_portal_subscription py-3">
+                <div class="sub_header_card d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>Invoice <span t-esc="invoice.name"/></h2>
+                        <span class="text-white-50">Issued: <strong class="text-white" t-field="invoice.invoice_date"/> | Due: <strong class="text-white" t-field="invoice.due_date"/></span>
+                    </div>
+                    <div>
+                        <span t-attf-class="badge sub_status_badge badge_state_#{invoice.state}" t-esc="invoice.state"/>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-12 col-md-6">
-                            <strong>Billed To</strong>
-                            <div t-field="invoice.partner_id"
-                                 t-options="{'widget': 'contact', 'fields': ['name', 'address', 'email'], 'no_marker': True}"/>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <dl class="row mb-0">
-                                <dt class="col-6">Invoice Date</dt>
-                                <dd class="col-6" t-field="invoice.invoice_date"/>
-                                <t t-if="invoice.due_date">
-                                    <dt class="col-6">Due Date</dt>
-                                    <dd t-attf-class="col-6 #{'text-danger fw-bold' if invoice.is_overdue else ''}" t-field="invoice.due_date"/>
-                                </t>
-                                <t t-if="invoice.subscription_id">
-                                    <dt class="col-6">Subscription</dt>
-                                    <dd class="col-6">
-                                        <a t-att-href="invoice.subscription_id.get_portal_url()" t-out="invoice.subscription_id.name"/>
-                                    </dd>
-                                </t>
-                            </dl>
-                        </div>
-                    </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Description</th>
-                                    <th class="text-end">Quantity</th>
-                                    <th class="text-end">Unit Price</th>
-                                    <th class="text-end d-none d-md-table-cell">Discount</th>
-                                    <th class="d-none d-md-table-cell">Taxes</th>
-                                    <th class="text-end">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="invoice.invoice_line_ids" t-as="line">
-                                    <td t-out="line.description or line.product_id.name"/>
-                                    <td class="text-end" t-field="line.quantity"/>
-                                    <td class="text-end" t-field="line.unit_price"/>
-                                    <td class="text-end d-none d-md-table-cell">
-                                        <t t-if="line.discount_amount">- <span t-field="line.discount_amount"/></t>
-                                    </td>
-                                    <td class="d-none d-md-table-cell" t-out="', '.join(line.tax_ids.mapped('name'))"/>
-                                    <td class="text-end" t-field="line.subtotal"/>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="row justify-content-end">
-                        <div class="col-12 col-md-5">
-                            <table class="table table-sm">
-                                <tr>
-                                    <td>Untaxed Amount</td>
-                                    <td class="text-end" t-field="invoice.amount_untaxed"/>
-                                </tr>
-                                <tr>
-                                    <td>Taxes</td>
-                                    <td class="text-end" t-field="invoice.amount_tax"/>
-                                </tr>
-                                <tr class="fw-bold border-top">
-                                    <td>Total</td>
-                                    <td class="text-end" t-field="invoice.amount_total"/>
-                                </tr>
-                                <tr t-if="invoice.amount_paid">
-                                    <td>Paid</td>
-                                    <td class="text-end" t-field="invoice.amount_paid"/>
-                                </tr>
-                                <tr class="fw-bold" t-if="invoice.state != 'cancelled'">
-                                    <td>Amount Due</td>
-                                    <td class="text-end" t-field="invoice.amount_due"/>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
+                <table class="table line_table mb-4">
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th class="text-end">Quantity</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Taxes</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="invoice.invoice_line_ids" t-as="line">
+                            <tr>
+                                <td>
+                                    <strong t-esc="line.product_id.name"/><br/>
+                                    <small class="text-muted" t-esc="line.description"/>
+                                </td>
+                                <td class="text-end"><span t-esc="line.quantity"/></td>
+                                <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></td>
+                                <td class="text-end"><span t-field="line.tax_amount" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></td>
+                                <td class="text-end"><span t-field="line.total" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
 
-                    <t t-if="invoice.payment_ids">
-                        <h5 class="mt-4">Payment History</h5>
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Method</th>
-                                        <th class="d-none d-md-table-cell">Reference</th>
-                                        <th class="text-end">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr t-foreach="invoice.payment_ids" t-as="payment">
-                                        <td t-field="payment.payment_date"/>
-                                        <td t-field="payment.payment_method"/>
-                                        <td class="d-none d-md-table-cell" t-out="payment.reference or ''"/>
-                                        <td class="text-end" t-field="payment.amount"/>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <div class="row justify-content-end mb-4">
+                    <div class="col-md-5">
+                        <div class="totals_box">
+                            <div class="total_row">
+                                <span>Subtotal Untaxed:</span>
+                                <span><field t-field="invoice.subtotal" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></span>
+                            </div>
+                            <div class="total_row">
+                                <span>Taxes:</span>
+                                <span><field t-field="invoice.tax_amount" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></span>
+                            </div>
+                            <div class="total_row grand_total">
+                                <span>Total Amount:</span>
+                                <span><field t-field="invoice.total_amount" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></span>
+                            </div>
+                            <div class="total_row text-success">
+                                <span>Amount Paid:</span>
+                                <span><field t-field="invoice.amount_paid" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></span>
+                            </div>
+                            <div class="total_row fw-bold text-danger border-top pt-2">
+                                <span>Balance Outstanding:</span>
+                                <span><field t-field="invoice.amount_due" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></span>
+                            </div>
                         </div>
-                    </t>
+                    </div>
                 </div>
             </div>
         </t>

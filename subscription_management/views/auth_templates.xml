@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="signup_page" name="Brightloop Customer Signup">
+        <t t-call="web.layout">
+            <t t-set="html_data" t-value="{'style': 'height: 100%;'}"/>
+            <t t-set="body_classname" t-value="'bg-light d-flex align-items-center justify-content-center'"/>
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="card shadow-lg border-0 rounded-4 p-4 p-md-5">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold text-primary mb-1">Brightloop Software</h3>
+                                <p class="text-muted">Create your cloud portal account</p>
+                            </div>
+                            <form action="/subscription/signup" method="post" id="signup_form">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="name">Full Name</label>
+                                    <input type="text" name="name" id="name" class="form-control form-control-lg" required="required" placeholder="Jane Doe"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="company_name">Company / Organization</label>
+                                    <input type="text" name="company_name" id="company_name" class="form-control form-control-lg" placeholder="Acme Corporation"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="login">Work Email</label>
+                                    <input type="email" name="login" id="login" class="form-control form-control-lg" required="required" placeholder="name@company.com"/>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold" for="password">Password</label>
+                                    <input type="password" name="password" id="password" class="form-control form-control-lg" required="required" placeholder="••••••••"/>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm mb-3">
+                                    Create Account
+                                </button>
+                                <div class="text-center">
+                                    <small class="text-muted">Already registered? <a href="/web/login" class="text-decoration-none">Sign in here</a></small>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

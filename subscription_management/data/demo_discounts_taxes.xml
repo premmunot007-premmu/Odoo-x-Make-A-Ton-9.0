@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tax Rules -->
+        <record id="tax_gst_18" model="subscription.tax">
+            <field name="name">GST 18%</field>
+            <field name="tax_type">percentage</field>
+            <field name="amount">18.0</field>
+            <field name="active">True</field>
+            <field name="is_active">True</field>
+            <field name="description">Standard Goods &amp; Services Tax for Software &amp; Cloud Services</field>
+        </record>
+
+        <record id="tax_service_5" model="subscription.tax">
+            <field name="name">Service Cess 5%</field>
+            <field name="tax_type">percentage</field>
+            <field name="amount">5.0</field>
+            <field name="active">True</field>
+            <field name="is_active">True</field>
+            <field name="description">Special IT consulting and SLA support services cess</field>
+        </record>
+
+        <record id="tax_fixed_handling" model="subscription.tax">
+            <field name="name">Fixed Platform Levy</field>
+            <field name="tax_type">fixed</field>
+            <field name="amount">100.0</field>
+            <field name="active">True</field>
+            <field name="is_active">True</field>
+            <field name="description">Dedicated secure compute environment surcharge</field>
+        </record>
+
+        <!-- Discount Rules -->
+        <record id="disc_bulk_seats_15" model="subscription.discount.rule">
+            <field name="name">Enterprise Bulk 15% Off</field>
+            <field name="discount_type">percentage</field>
+            <field name="amount">15.0</field>
+            <field name="min_quantity">10</field>
+            <field name="apply_on">subscription</field>
+            <field name="max_usage">100</field>
+            <field name="current_usage">2</field>
+            <field name="active">True</field>
+            <field name="is_active">True</field>
+            <field name="description">Applies to any subscription with 10 or more licenses</field>
+        </record>
+
+        <record id="disc_startup_voucher" model="subscription.discount.rule">
+            <field name="name">Startup Welcome Voucher ₹1000</field>
+            <field name="discount_type">fixed</field>
+            <field name="amount">1000.0</field>
+            <field name="min_purchase">2000.0</field>
+            <field name="apply_on">subscription</field>
+            <field name="max_usage">50</field>
+            <field name="current_usage">8</field>
+            <field name="active">True</field>
+            <field name="is_active">True</field>
+            <field name="description">New onboarded startup welcome credit for orders ₹2000+</field>
+        </record>
+
+        <record id="disc_crm_promo" model="subscription.discount.rule">
+            <field name="name">CRM Early Bird 10%</field>
+            <field name="discount_type">percentage</field>
+            <field name="amount">10.0</field>
+            <field name="apply_on">product</field>
+            <field name="product_ids" eval="[(6, 0, [ref('prod_brightloop_crm')])]"/>
+            <field name="max_usage">20</field>
+            <field name="current_usage">3</field>
+            <field name="active">True</field>
+            <field name="is_active">True</field>
+            <field name="description">Early bird introductory discount on Brightloop CRM licenses</field>
+        </record>
+    </data>
+</odoo>

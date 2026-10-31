@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- 1. Paid Invoice Last Month -->
+        <record id="inv_paid_last_month" model="subscription.invoice">
+            <field name="name">INV/2026/09/0001</field>
+            <field name="partner_id" ref="customer_small_shop"/>
+            <field name="subscription_id" ref="sub_active_acuity"/>
+            <field name="invoice_date" eval="(datetime.date.today().replace(day=1) - datetime.timedelta(days=1)).replace(day=1).strftime('%Y-%m-%d')"/>
+            <field name="due_date" eval="(datetime.date.today() - datetime.timedelta(days=15)).strftime('%Y-%m-%d')"/>
+            <field name="state">paid</field>
+        </record>
+
+        <record id="inv_line_paid_crm" model="subscription.invoice.line">
+            <field name="invoice_id" ref="inv_paid_last_month"/>
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="description">Brightloop CRM - Monthly Subscription</field>
+            <field name="quantity">1.0</field>
+            <field name="unit_price">1200.0</field>
+        </record>
+
+        <record id="inv_line_paid_storage" model="subscription.invoice.line">
+            <field name="invoice_id" ref="inv_paid_last_month"/>
+            <field name="product_id" ref="prod_storage_boost"/>
+            <field name="description">100GB Extra Cloud Storage</field>
+            <field name="quantity">1.0</field>
+            <field name="unit_price">250.0</field>
+        </record>
+
+        <!-- 2. Confirmed Outstanding Invoice -->
+        <record id="inv_confirmed_outstanding" model="subscription.invoice">
+            <field name="name">INV/2026/10/0002</field>
+            <field name="partner_id" ref="customer_enterprise_corp"/>
+            <field name="subscription_id" ref="sub_active_starlight"/>
+            <field name="invoice_date" eval="(datetime.date.today() - datetime.timedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="due_date" eval="(datetime.date.today() + datetime.timedelta(days=25)).strftime('%Y-%m-%d')"/>
+            <field name="state">confirmed</field>
+        </record>
+
+        <record id="inv_line_conf_erp" model="subscription.invoice.line">
+            <field name="invoice_id" ref="inv_confirmed_outstanding"/>
+            <field name="product_id" ref="prod_brightloop_erp"/>
+            <field name="description">Brightloop Enterprise Suite (25 Seats with Odoo Sync)</field>
+            <field name="quantity">25.0</field>
+            <field name="unit_price">4060.0</field>
+        </record>
+
+        <record id="inv_line_conf_support" model="subscription.invoice.line">
+            <field name="invoice_id" ref="inv_confirmed_outstanding"/>
+            <field name="product_id" ref="prod_vip_support"/>
+            <field name="description">24/7 Dedicated Priority Support</field>
+            <field name="quantity">1.0</field>
+            <field name="unit_price">1500.0</field>
+        </record>
+
+        <!-- 3. Overdue Urgent Invoice -->
+        <record id="inv_overdue_urgent" model="subscription.invoice">
+            <field name="name">INV/2026/09/0003</field>
+            <field name="partner_id" ref="customer_retail_chain"/>
+            <field name="subscription_id" ref="sub_paused_urbancart"/>
+            <field name="invoice_date" eval="(datetime.date.today() - datetime.timedelta(days=45)).strftime('%Y-%m-%d')"/>
+            <field name="due_date" eval="(datetime.date.today() - datetime.timedelta(days=15)).strftime('%Y-%m-%d')"/>
+            <field name="state">overdue</field>
+            <field name="notes">Payment overdue by 15 days - 2nd reminder sent</field>
+        </record>
+
+        <record id="inv_line_overdue_crm" model="subscription.invoice.line">
+            <field name="invoice_id" ref="inv_overdue_urgent"/>
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="description">Brightloop CRM - 2 Licences</field>
+            <field name="quantity">2.0</field>
+            <field name="unit_price">1200.0</field>
+        </record>
+
+        <!-- 4. Draft Upcoming Invoice -->
+        <record id="inv_draft_upcoming" model="subscription.invoice">
+            <field name="name">INV/2026/10/0004</field>
+            <field name="partner_id" ref="customer_tech_startup"/>
+            <field name="invoice_date" eval="datetime.date.today().strftime('%Y-%m-%d')"/>
+            <field name="due_date" eval="(datetime.date.today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')"/>
+            <field name="state">draft</field>
+        </record>
+
+        <record id="inv_line_draft_crm" model="subscription.invoice.line">
+            <field name="invoice_id" ref="inv_draft_upcoming"/>
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="description">Brightloop CRM - Pilot 5 Seats</field>
+            <field name="quantity">5.0</field>
+            <field name="unit_price">1200.0</field>
+        </record>
+    </data>
+</odoo>

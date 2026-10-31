@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Products -->
+        <record id="prod_brightloop_crm" model="subscription.product">
+            <field name="name">Brightloop CRM</field>
+            <field name="product_code">CRM-CORE</field>
+            <field name="product_type">software</field>
+            <field name="sales_price">1200.0</field>
+            <field name="base_price">1200.0</field>
+            <field name="cost_price">400.0</field>
+            <field name="description">Full customer relationship management system with pipeline tracking, automated email integration, and deal analytics.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="prod_brightloop_erp" model="subscription.product">
+            <field name="name">Brightloop Enterprise Suite</field>
+            <field name="product_code">ERP-SUITE</field>
+            <field name="product_type">software</field>
+            <field name="sales_price">3500.0</field>
+            <field name="base_price">3500.0</field>
+            <field name="cost_price">1200.0</field>
+            <field name="description">Unified ERP backend with accounting, inventory, supply chain, and multi-entity payroll orchestration.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="prod_email_marketing" model="subscription.product">
+            <field name="name">Email Marketing Automation Add-on</field>
+            <field name="product_code">ADDON-MKT</field>
+            <field name="product_type">addon</field>
+            <field name="sales_price">450.0</field>
+            <field name="base_price">450.0</field>
+            <field name="cost_price">100.0</field>
+            <field name="description">Send up to 50k monthly newsletter campaigns with automated A/B testing and open rate tracking.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="prod_storage_boost" model="subscription.product">
+            <field name="name">100GB Extra Cloud Storage</field>
+            <field name="product_code">ADDON-STORAGE</field>
+            <field name="product_type">addon</field>
+            <field name="sales_price">250.0</field>
+            <field name="base_price">250.0</field>
+            <field name="cost_price">50.0</field>
+            <field name="description">High-speed encrypted backup cloud storage with automated redundancy.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="prod_vip_support" model="subscription.product">
+            <field name="name">24/7 Dedicated Priority Support</field>
+            <field name="product_code">SRV-SUPPORT</field>
+            <field name="product_type">service</field>
+            <field name="sales_price">1500.0</field>
+            <field name="base_price">1500.0</field>
+            <field name="cost_price">600.0</field>
+            <field name="description">1-hour SLA direct phone, WhatsApp, and private Slack channel support with dedicated engineers.</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Variants -->
+        <record id="var_erp_odoo" model="subscription.product.variant">
+            <field name="product_id" ref="prod_brightloop_erp"/>
+            <field name="variant_name">Brand</field>
+            <field name="variant_value">Odoo Integrated</field>
+            <field name="name">Brand: Odoo Integrated</field>
+            <field name="variant_code">ERP-ODOO-SYNC</field>
+            <field name="price_extra">560.0</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="var_crm_standard" model="subscription.product.variant">
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="variant_name">Brand</field>
+            <field name="variant_value">Standard Edition</field>
+            <field name="name">Brand: Standard Edition</field>
+            <field name="variant_code">CRM-STD</field>
+            <field name="price_extra">0.0</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="var_crm_odoo" model="subscription.product.variant">
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="variant_name">Brand</field>
+            <field name="variant_value">Odoo Enterprise Sync</field>
+            <field name="name">Brand: Odoo Enterprise Sync</field>
+            <field name="variant_code">CRM-ODOO-SYNC</field>
+            <field name="price_extra">560.0</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

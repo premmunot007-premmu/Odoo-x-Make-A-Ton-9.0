@@ -1,88 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="subscription_management.Dashboard">
-        <div class="o_subscription_dashboard container-fluid py-4 h-100 overflow-auto">
-            <h2 class="mb-4">Subscription Dashboard</h2>
+        <div class="o_subscription_dashboard">
+            <!-- Header Bar -->
+            <div class="dash_title_bar">
+                <div>
+                    <h2>Brightloop Subscription &amp; Finance Executive Center</h2>
+                    <span class="text-muted fs-6">Real-time metrics, active recurring billing, and collection status</span>
+                </div>
+                <button class="refresh_btn shadow-sm" t-on-click="loadData">
+                    <i class="fa fa-refresh me-1"/> Refresh Live Data
+                </button>
+            </div>
 
-            <!-- KPI Cards Row -->
-            <div class="row g-3 mb-4">
-                <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card bg-primary text-white shadow cursor-pointer h-100" t-on-click="openActiveSubscriptions">
-                        <div class="card-body text-center">
-                            <h5>Active Subscriptions</h5>
-                            <div class="o_kpi_value" t-esc="state.activeSubscriptions"/>
-                        </div>
+            <!-- 4 Modern KPI Cards Grid -->
+            <div class="kpi_grid">
+                <!-- KPI 1: Active Subscriptions -->
+                <div class="kpi_card kpi_blue" t-on-click="openSubscriptions">
+                    <div class="kpi_title">Active Subscriptions</div>
+                    <div class="kpi_value text-primary">
+                        <t t-esc="state.activeSubscriptions"/>
                     </div>
+                    <small class="text-muted mt-2 d-block">
+                        <i class="fa fa-arrow-circle-right me-1"/> View active contracts
+                    </small>
                 </div>
-                <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card bg-success text-white shadow cursor-pointer h-100" t-on-click="openPayments">
-                        <div class="card-body text-center">
-                            <h5>Collected This Month</h5>
-                            <div class="o_kpi_value" t-esc="formatAmount(state.collectedThisMonth)"/>
-                        </div>
+
+                <!-- KPI 2: Total Revenue -->
+                <div class="kpi_card kpi_green" t-on-click="openInvoices">
+                    <div class="kpi_title">Total Revenue Collected</div>
+                    <div class="kpi_value text-success">
+                        ₹<t t-esc="state.totalRevenue.toLocaleString()"/>
                     </div>
+                    <small class="text-muted mt-2 d-block">
+                        <i class="fa fa-check-circle me-1"/> Settled invoice revenue
+                    </small>
                 </div>
-                <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card bg-warning text-dark shadow cursor-pointer h-100" t-on-click="openOutstandingInvoices">
-                        <div class="card-body text-center">
-                            <h5>Outstanding</h5>
-                            <div class="o_kpi_value" t-esc="formatAmount(state.outstandingAmount)"/>
-                        </div>
+
+                <!-- KPI 3: Outstanding Receivables -->
+                <div class="kpi_card kpi_yellow" t-on-click="openOutstanding">
+                    <div class="kpi_title">Outstanding Receivables</div>
+                    <div class="kpi_value text-warning">
+                        ₹<t t-esc="state.outstandingAmount.toLocaleString()"/>
                     </div>
+                    <small class="text-muted mt-2 d-block">
+                        <i class="fa fa-clock-o me-1"/> Pending customer dues
+                    </small>
                 </div>
-                <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card bg-danger text-white shadow cursor-pointer h-100" t-on-click="openOverdueInvoices">
-                        <div class="card-body text-center">
-                            <h5>Overdue Invoices</h5>
-                            <div class="o_kpi_value" t-esc="state.overdueInvoices"/>
-                        </div>
+
+                <!-- KPI 4: Overdue Invoices -->
+                <div class="kpi_card kpi_red" t-on-click="openOverdueInvoices">
+                    <div class="kpi_title">Overdue Invoices</div>
+                    <div class="kpi_value text-danger">
+                        <t t-esc="state.overdueInvoices"/>
                     </div>
+                    <small class="text-muted mt-2 d-block">
+                        <i class="fa fa-exclamation-triangle me-1"/> Requires immediate follow-up
+                    </small>
                 </div>
             </div>
 
-            <div class="row g-3">
-                <!-- Monthly collections trend -->
-                <div class="col-12 col-lg-7">
-                    <div class="card shadow h-100">
-                        <div class="card-header"><h5 class="mb-0">Payments Collected (Last 6 Months)</h5></div>
-                        <div class="card-body">
-                            <div class="o_revenue_chart d-flex align-items-end gap-2">
-                                <t t-foreach="state.monthlyRevenue" t-as="month" t-key="month.label">
-                                    <div class="o_revenue_bar_col d-flex flex-column align-items-center flex-fill h-100 justify-content-end">
-                                        <small class="text-muted mb-1 text-nowrap" t-esc="formatAmount(month.amount)"/>
-                                        <div class="o_revenue_bar bg-success w-100"
-                                             t-att-style="'height: ' + barHeight(month.amount) + '%'"
-                                             t-att-title="month.label + ': ' + formatAmount(month.amount)"/>
-                                        <small class="mt-1 text-nowrap" t-esc="month.label"/>
-                                    </div>
+            <!-- Data Analytics Panels -->
+            <div class="data_panels">
+                <!-- Recent Subscriptions Panel -->
+                <div class="panel_card">
+                    <div class="panel_header d-flex justify-content-between align-items-center">
+                        <span>Recent Subscriptions Activity</span>
+                        <a href="#" class="text-primary fs-7 text-decoration-none" t-on-click.prevent="openSubscriptions">View All</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Contract</th>
+                                    <th>Customer</th>
+                                    <th>Plan</th>
+                                    <th>State</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="state.recentSubscriptions.length === 0">
+                                    <tr><td colspan="5" class="text-center text-muted py-3">No subscriptions found</td></tr>
                                 </t>
-                            </div>
-                        </div>
+                                <t t-foreach="state.recentSubscriptions" t-as="sub" t-key="sub.id">
+                                    <tr class="cursor-pointer" t-on-click="() => this.openSubscriptionDetail(sub.id)">
+                                        <td><strong><t t-esc="sub.name"/></strong></td>
+                                        <td><t t-esc="sub.partner_id ? sub.partner_id[1] : '-'"/></td>
+                                        <td><t t-esc="sub.plan_id ? sub.plan_id[1] : '-'"/></td>
+                                        <td>
+                                            <span class="badge bg-primary text-white text-uppercase" t-esc="sub.state"/>
+                                        </td>
+                                        <td class="text-end fw-bold">
+                                            ₹<t t-esc="(sub.total_amount || 0).toLocaleString()"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Status Distribution -->
-                <div class="col-12 col-lg-5">
-                    <div class="card shadow h-100">
-                        <div class="card-header"><h5 class="mb-0">Subscription Status</h5></div>
-                        <div class="card-body">
-                            <table class="table table-hover mb-0">
-                                <thead><tr><th>Status</th><th class="text-end">Count</th><th class="w-50">Share</th></tr></thead>
-                                <tbody>
-                                    <t t-foreach="state.statusDistribution" t-as="item" t-key="item.state">
-                                        <tr class="cursor-pointer" t-on-click="() => this.openSubscriptionsByState(item.state, item.label)">
-                                            <td t-esc="item.label"/>
-                                            <td class="text-end" t-esc="item.count"/>
-                                            <td class="align-middle">
-                                                <div class="progress" style="height: 8px;">
-                                                    <div class="progress-bar" t-att-style="'width: ' + statusShare(item.count) + '%'"/>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-                        </div>
+                <!-- Status Distribution Breakdown -->
+                <div class="panel_card">
+                    <div class="panel_header">Lifecycle State Distribution</div>
+                    <div class="p-2">
+                        <t t-if="state.statusDistribution.length === 0">
+                            <p class="text-muted text-center py-3">No contract metrics recorded</p>
+                        </t>
+                        <t t-foreach="state.statusDistribution" t-as="item" t-key="item.label">
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="fw-medium text-secondary">
+                                    <i class="fa fa-circle me-2 text-primary" style="font-size: 0.65rem;"/>
+                                    <t t-esc="item.label"/>
+                                </span>
+                                <span class="badge bg-light text-dark fs-6 px-3 py-1 border">
+                                    <t t-esc="item.count"/>
+                                </span>
+                            </div>
+                        </t>
                     </div>
                 </div>
             </div>

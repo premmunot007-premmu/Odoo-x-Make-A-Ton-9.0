@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Demo Customer 1: Small Shop -->
+        <record id="customer_small_shop" model="res.partner">
+            <field name="name">Acuity Bakery &amp; Cafe</field>
+            <field name="is_company">True</field>
+            <field name="customer_rank">1</field>
+            <field name="email">contact@acuitybakery.com</field>
+            <field name="phone">+91 98765 43210</field>
+            <field name="street">42 Market Street</field>
+            <field name="city">Bangalore</field>
+            <field name="zip">560001</field>
+        </record>
+
+        <!-- Demo Customer 2: Enterprise Corporation -->
+        <record id="customer_enterprise_corp" model="res.partner">
+            <field name="name">Starlight Logistics Pvt Ltd</field>
+            <field name="is_company">True</field>
+            <field name="customer_rank">1</field>
+            <field name="email">billing@starlightlogistics.com</field>
+            <field name="phone">+91 98220 11223</field>
+            <field name="street">Tower 4, Cyber City</field>
+            <field name="city">Gurgaon</field>
+            <field name="zip">122002</field>
+        </record>
+
+        <!-- Demo Customer 3: Tech Startup -->
+        <record id="customer_tech_startup" model="res.partner">
+            <field name="name">NovaEdge Tech Labs</field>
+            <field name="is_company">True</field>
+            <field name="customer_rank">1</field>
+            <field name="email">ops@novaedge.io</field>
+            <field name="street">10 Innovation Hub</field>
+            <field name="city">Hyderabad</field>
+            <field name="zip">500081</field>
+        </record>
+
+        <!-- Demo Customer 4: Retail Chain -->
+        <record id="customer_retail_chain" model="res.partner">
+            <field name="name">Urban Cart Supermarkets</field>
+            <field name="is_company">True</field>
+            <field name="customer_rank">1</field>
+            <field name="email">accounts@urbancart.in</field>
+            <field name="street">88 Ring Road</field>
+            <field name="city">Mumbai</field>
+            <field name="zip">400050</field>
+        </record>
+    </data>
+</odoo>

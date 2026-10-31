@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- 1. Active: Acuity Bakery -->
+        <record id="sub_active_acuity" model="subscription.subscription">
+            <field name="name">SUB/2026/09/0001</field>
+            <field name="partner_id" ref="customer_small_shop"/>
+            <field name="plan_id" ref="plan_starter_monthly"/>
+            <field name="state">active</field>
+            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')"/>
+            <field name="next_billing_date" eval="(datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="payment_term">30_days</field>
+        </record>
+
+        <record id="sub_line_acuity_crm" model="subscription.subscription.line">
+            <field name="subscription_id" ref="sub_active_acuity"/>
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="quantity">1.0</field>
+            <field name="unit_price">1200.0</field>
+        </record>
+
+        <record id="sub_line_acuity_storage" model="subscription.subscription.line">
+            <field name="subscription_id" ref="sub_active_acuity"/>
+            <field name="product_id" ref="prod_storage_boost"/>
+            <field name="quantity">1.0</field>
+            <field name="unit_price">250.0</field>
+        </record>
+
+        <!-- 2. Active Enterprise: Starlight Logistics -->
+        <record id="sub_active_starlight" model="subscription.subscription">
+            <field name="name">SUB/2026/04/0002</field>
+            <field name="partner_id" ref="customer_enterprise_corp"/>
+            <field name="plan_id" ref="plan_growth_yearly"/>
+            <field name="state">active</field>
+            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=180)).strftime('%Y-%m-%d')"/>
+            <field name="end_date" eval="(datetime.date.today() + datetime.timedelta(days=185)).strftime('%Y-%m-%d')"/>
+            <field name="expiry_date" eval="(datetime.date.today() + datetime.timedelta(days=185)).strftime('%Y-%m-%d')"/>
+            <field name="next_billing_date" eval="(datetime.date.today() + datetime.timedelta(days=185)).strftime('%Y-%m-%d')"/>
+            <field name="payment_term">60_days</field>
+        </record>
+
+        <record id="sub_line_starlight_erp" model="subscription.subscription.line">
+            <field name="subscription_id" ref="sub_active_starlight"/>
+            <field name="product_id" ref="prod_brightloop_erp"/>
+            <field name="variant_id" ref="var_erp_odoo"/>
+            <field name="quantity">25.0</field>
+            <field name="unit_price">3500.0</field>
+        </record>
+
+        <record id="sub_line_starlight_support" model="subscription.subscription.line">
+            <field name="subscription_id" ref="sub_active_starlight"/>
+            <field name="product_id" ref="prod_vip_support"/>
+            <field name="quantity">1.0</field>
+            <field name="unit_price">1500.0</field>
+        </record>
+
+        <!-- 3. Quotation: NovaEdge Tech Labs -->
+        <record id="sub_quotation_nova" model="subscription.subscription">
+            <field name="name">SUB/2026/10/0003</field>
+            <field name="partner_id" ref="customer_tech_startup"/>
+            <field name="plan_id" ref="plan_starter_monthly"/>
+            <field name="state">quotation</field>
+            <field name="start_date" eval="datetime.date.today().strftime('%Y-%m-%d')"/>
+            <field name="payment_term">30_days</field>
+        </record>
+
+        <record id="sub_line_nova_crm" model="subscription.subscription.line">
+            <field name="subscription_id" ref="sub_quotation_nova"/>
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="quantity">5.0</field>
+            <field name="unit_price">1200.0</field>
+        </record>
+
+        <!-- 4. Paused: Urban Cart -->
+        <record id="sub_paused_urbancart" model="subscription.subscription">
+            <field name="name">SUB/2026/07/0004</field>
+            <field name="partner_id" ref="customer_retail_chain"/>
+            <field name="plan_id" ref="plan_starter_monthly"/>
+            <field name="state">paused</field>
+            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=90)).strftime('%Y-%m-%d')"/>
+            <field name="payment_term">30_days</field>
+        </record>
+
+        <record id="sub_line_urban_crm" model="subscription.subscription.line">
+            <field name="subscription_id" ref="sub_paused_urbancart"/>
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="quantity">2.0</field>
+            <field name="unit_price">1200.0</field>
+        </record>
+
+        <!-- 5. Closed Old Pilot: Acuity Bakery -->
+        <record id="sub_closed_old" model="subscription.subscription">
+            <field name="name">SUB/2026/08/0005</field>
+            <field name="partner_id" ref="customer_small_shop"/>
+            <field name="plan_id" ref="plan_trial_daily"/>
+            <field name="state">closed</field>
+            <field name="start_date" eval="(datetime.date.today() - datetime.timedelta(days=60)).strftime('%Y-%m-%d')"/>
+            <field name="end_date" eval="(datetime.date.today() - datetime.timedelta(days=45)).strftime('%Y-%m-%d')"/>
+            <field name="expiry_date" eval="(datetime.date.today() - datetime.timedelta(days=45)).strftime('%Y-%m-%d')"/>
+            <field name="payment_term">immediate</field>
+        </record>
+
+        <record id="sub_line_closed_crm" model="subscription.subscription.line">
+            <field name="subscription_id" ref="sub_closed_old"/>
+            <field name="product_id" ref="prod_brightloop_crm"/>
+            <field name="quantity">1.0</field>
+            <field name="unit_price">100.0</field>
+        </record>
+    </data>
+</odoo>

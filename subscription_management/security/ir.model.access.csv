@@ -34,3 +34,6 @@ access_subscription_invoice_portal,subscription.invoice portal,model_subscriptio
 access_subscription_invoice_line_portal,subscription.invoice.line portal,model_subscription_invoice_line,base.group_portal,1,0,0,0
 access_subscription_payment_portal,subscription.payment portal,model_subscription_payment,base.group_portal,1,0,0,0
 access_subscription_tax_portal,subscription.tax portal,model_subscription_tax,base.group_portal,1,0,0,0
+access_subscription_payment_wizard_staff,subscription.payment.wizard staff,model_subscription_payment_wizard,group_subscription_staff,1,1,1,1
+access_subscription_payment_wizard_admin,subscription.payment.wizard admin,model_subscription_payment_wizard,group_subscription_admin,1,1,1,1
+

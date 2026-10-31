@@ -62,6 +62,35 @@ class SubscriptionInvoice(models.Model):
         'res.company', string="Company", required=True, default=lambda self: self.env.company,
     )
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string="Currency")
+    total_amount = fields.Monetary(string="Total Amount", compute='_compute_total_amount', store=True)
+    subtotal = fields.Monetary(string="Untaxed Subtotal", compute='_compute_subtotal', store=True)
+    tax_amount = fields.Monetary(string="Tax Amount", compute='_compute_tax_amount', store=True)
+    notes = fields.Text(string="Notes Text", compute='_compute_notes', inverse='_inverse_notes', store=True)
+
+    @api.depends('amount_total')
+    def _compute_total_amount(self):
+        for rec in self:
+            rec.total_amount = rec.amount_total
+
+    @api.depends('amount_untaxed')
+    def _compute_subtotal(self):
+        for rec in self:
+            rec.subtotal = rec.amount_untaxed
+
+    @api.depends('amount_tax')
+    def _compute_tax_amount(self):
+        for rec in self:
+            rec.tax_amount = rec.amount_tax
+
+    @api.depends('note')
+    def _compute_notes(self):
+        for rec in self:
+            rec.notes = rec.note
+
+    def _inverse_notes(self):
+        for rec in self:
+            rec.note = rec.notes
+
     note = fields.Text(string="Notes")
 
     _sql_constraints = [
@@ -204,10 +233,24 @@ class SubscriptionInvoiceLine(models.Model):
     quantity = fields.Float(string="Quantity", required=True, default=1.0)
     unit_price = fields.Float(string="Unit Price", required=True, digits=(10, 2))
     tax_ids = fields.Many2many('subscription.tax', string="Taxes", domain=[('is_active', '=', True)])
-    discount_amount = fields.Float(string="Discount", default=0.0, digits=(10, 2))
+    tax_id = fields.Many2one('subscription.tax', string="Tax", compute='_compute_single_tax', inverse='_inverse_single_tax')
+    discount_amount = fields.Float(string="Discount Amount", default=0.0, digits=(10, 2))
+    discount = fields.Float(string="Discount (%)", default=0.0)
     subtotal = fields.Monetary(string="Subtotal", compute='_compute_amounts', store=True)
     tax_amount = fields.Monetary(string="Tax Amount", compute='_compute_amounts', store=True)
     total = fields.Monetary(string="Total", compute='_compute_amounts', store=True)
+
+    @api.depends('tax_ids')
+    def _compute_single_tax(self):
+        for rec in self:
+            rec.tax_id = rec.tax_ids[0] if rec.tax_ids else False
+
+    def _inverse_single_tax(self):
+        for rec in self:
+            if rec.tax_id:
+                rec.tax_ids = [(6, 0, [rec.tax_id.id])]
+            else:
+                rec.tax_ids = [(5, 0, 0)]
 
     @api.depends('quantity', 'unit_price', 'discount_amount', 'tax_ids.amount', 'tax_ids.tax_type')
     def _compute_amounts(self):

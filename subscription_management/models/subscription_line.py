@@ -20,10 +20,23 @@ class SubscriptionLine(models.Model):
     quantity = fields.Float(string="Quantity", required=True, default=1.0)
     unit_price = fields.Float(string="Unit Price", required=True, digits=(10, 2))
     tax_ids = fields.Many2many('subscription.tax', string="Taxes", domain=[('is_active', '=', True)])
+    tax_id = fields.Many2one('subscription.tax', string="Tax", compute='_compute_single_tax', inverse='_inverse_single_tax')
     discount = fields.Float(string="Discount (%)", default=0.0)
     subtotal = fields.Monetary(string="Subtotal", compute='_compute_amounts', store=True)
     tax_amount = fields.Monetary(string="Tax Amount", compute='_compute_amounts', store=True)
     total = fields.Monetary(string="Total", compute='_compute_amounts', store=True)
+
+    @api.depends('tax_ids')
+    def _compute_single_tax(self):
+        for rec in self:
+            rec.tax_id = rec.tax_ids[0] if rec.tax_ids else False
+
+    def _inverse_single_tax(self):
+        for rec in self:
+            if rec.tax_id:
+                rec.tax_ids = [(6, 0, [rec.tax_id.id])]
+            else:
+                rec.tax_ids = [(5, 0, 0)]
 
     @api.depends(
         'quantity', 'unit_price', 'discount', 'variant_id.price_extra',
