@@ -1,2 +1,5 @@
 __pycache__/
 *.py[cod]
+*.zip
+setup_db_user.py
+pdf_text.txt
